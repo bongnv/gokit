@@ -1,4 +1,4 @@
-package parser
+package gokit
 
 import (
 	"errors"
@@ -38,14 +38,19 @@ type Service struct {
 	Imports     []*Import
 }
 
-// Parse ...
-func Parse(path string) (*Service, error) {
-	pkgs, err := parsePackages(path)
+func (h *handler) parseSource() error {
+	pkgs, err := parsePackages(h.opts.Path)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return parseServiceData(pkgs)
+	s, err := h.parseServiceData(pkgs)
+	if err != nil {
+		return err
+	}
+
+	h.service = s
+	return nil
 }
 
 func parsePackages(path string) ([]*packages.Package, error) {
@@ -66,7 +71,7 @@ func parsePackages(path string) ([]*packages.Package, error) {
 	)
 }
 
-func parseServiceData(pkgs []*packages.Package) (*Service, error) {
+func (h *handler) parseServiceData(pkgs []*packages.Package) (*Service, error) {
 	for _, pkg := range pkgs {
 		for _, f := range pkg.Syntax {
 			for _, decl := range f.Decls {
@@ -86,33 +91,51 @@ func parseServiceData(pkgs []*packages.Package) (*Service, error) {
 							continue
 						}
 
-						d := &Service{
-							Package:     pkg.PkgPath,
-							PackageName: f.Name.Name,
-							Endpoints:   parseEndpointsFrom(sType),
-							Imports:     extractImports(f),
+						p := &serviceParser{
+							f:           f,
+							packageName: f.Name.Name,
+							serviceType: sType,
+							pkg:         pkg,
 						}
 
-						return d, nil
+						return p.parseService()
 					}
 				}
 			}
 		}
 	}
 
-	return nil, errors.New("parser: no service found")
+	return nil, errors.New("serviceParser: no service found")
 }
 
-func parseEndpointsFrom(i *ast.InterfaceType) []Endpoint {
+type serviceParser struct {
+	pkg         *packages.Package
+	f           *ast.File
+	serviceType *ast.InterfaceType
+	packageName string
+}
+
+func (p *serviceParser) parseService() (*Service, error) {
+	s := &Service{
+		Package:     p.pkg.PkgPath,
+		PackageName: p.packageName,
+		Endpoints:   p.parseEndpointsFrom(),
+		Imports:     extractImports(p.f),
+	}
+
+	return s, nil
+}
+
+func (p *serviceParser) parseEndpointsFrom() []Endpoint {
 	var methods []Endpoint
-	for _, method := range i.Methods.List {
+	for _, method := range p.serviceType.Methods.List {
 		fnType, ok := method.Type.(*ast.FuncType)
 		if !ok {
 			continue
 		}
 
-		params := extractFieldsFromAst(fnType.Params.List)
-		results := extractFieldsFromAst(fnType.Results.List)
+		params := p.extractFieldsFromAst(fnType.Params.List)
+		results := p.extractFieldsFromAst(fnType.Results.List)
 
 		methods = append(methods, Endpoint{
 			Name:    method.Names[0].Name,
@@ -124,12 +147,12 @@ func parseEndpointsFrom(i *ast.InterfaceType) []Endpoint {
 	return methods
 }
 
-func getTypeString(expr ast.Expr) string {
+func (p *serviceParser) getTypeString(expr ast.Expr) string {
 	var result string
 
 	switch etype := expr.(type) {
 	case *ast.ArrayType:
-		result = fmt.Sprintf("[]%s", getTypeString(etype.Elt))
+		result = fmt.Sprintf("[]%s", p.getTypeString(etype.Elt))
 	case *ast.MapType:
 		result = fmt.Sprintf("map[%s]%s", etype.Key, etype.Value)
 
@@ -137,7 +160,10 @@ func getTypeString(expr ast.Expr) string {
 		result = fmt.Sprintf("%s.%s", etype.X, etype.Sel)
 
 	case *ast.StarExpr:
-		result = fmt.Sprintf("*%s", getTypeString(etype.X))
+		result = fmt.Sprintf("*%s", p.getTypeString(etype.X))
+
+	case *ast.Ident:
+		result = fmt.Sprintf("%s.%s", p.packageName, etype.Name)
 
 	default:
 		result = fmt.Sprintf("%s", etype)
@@ -145,11 +171,11 @@ func getTypeString(expr ast.Expr) string {
 	return result
 }
 
-func extractFieldsFromAst(items []*ast.Field) []Field {
+func (p *serviceParser) extractFieldsFromAst(items []*ast.Field) []Field {
 	var output []Field
 
 	for _, item := range items {
-		typeStr := getTypeString(item.Type)
+		typeStr := p.getTypeString(item.Type)
 		name := ""
 
 		//  nil if anonymous field

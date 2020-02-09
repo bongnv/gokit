@@ -1,5 +1,5 @@
 {{- $packageName := .PackageName }}
-{{- $serviceInterface := printf "%s.%s" .PackageName .TypeName -}}
+{{- $serviceInterface := printf "%s.Service" .PackageName -}}
 
 package server
 
@@ -12,8 +12,8 @@ import (
 
 // Endpoints ...
 type Endpoints struct {
-{{ range $method := .Methods }}
-	{{- $method.Name }}Endpoint endpoint.Endpoint
+{{ range $endpoint := .Endpoints }}
+	{{- $endpoint.Name }}Endpoint endpoint.Endpoint
 {{ end -}}
 }
 
@@ -21,19 +21,19 @@ type Endpoints struct {
 // the corresponding method on the provided service.
 func MakeServerEndpoints(s {{ $serviceInterface }}) Endpoints {
 	return Endpoints{
-	{{ range $method := .Methods }}
-		{{- $method.Name }}Endpoint: make{{ $method.Name }}Endpoint(s),
+	{{ range $endpoint := .Endpoints }}
+		{{- $endpoint.Name }}Endpoint: make{{ $endpoint.Name }}Endpoint(s),
 	{{ end -}}
 	}
 }
 
-{{ range $method := .Methods }}
-// make{{ $method.Name }}Endpoint returns an endpoint via the passed service.
-func make{{ $method.Name }}Endpoint(s {{ $serviceInterface }}) endpoint.Endpoint {
+{{ range $endpoint := .Endpoints }}
+// make{{ $endpoint.Name }}Endpoint returns an endpoint via the passed service.
+func make{{ $endpoint.Name }}Endpoint(s {{ $serviceInterface }}) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-	{{- $requestType := replace (index $method.Params 1).Type "*" (concat "*" $packageName ".") }}
+	{{- $requestType := replace (index $endpoint.Params 1).Type "*" (concat "*" $packageName ".") }}
 		req := request.({{ $requestType }})
-		resp, e := s.{{ $method.Name }}(ctx, req)
+		resp, e := s.{{ $endpoint.Name }}(ctx, req)
 		return resp, e
 	}
 }
