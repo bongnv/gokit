@@ -14,7 +14,13 @@ import (
 
 const (
 	endpointsTemplateName = "endpoints"
-	endpointsFileName     = "z_endpoints.go"
+	serverTemplateName    = "server"
+)
+
+var (
+	internalFolder    = "internal"
+	endpointsFileName = path.Join(internalFolder, "endpoint", "z_endpoints.go")
+	serverFileName    = path.Join(internalFolder, "server", "z_server.go")
 )
 
 func (h *handler) generateEndpoints() error {
@@ -23,9 +29,22 @@ func (h *handler) generateEndpoints() error {
 		return err
 	}
 
-	endpointFile := path.Join(h.opts.Path, "internal", "endpoint", endpointsFileName)
+	endpointFile := path.Join(h.opts.Path, endpointsFileName)
 
-	log.Println("Formatting ...")
+	log.Println("Formatting ", endpointsFileName)
+	buf, err = imports.Process(endpointFile, buf, nil)
+	return h.writeToFile(endpointFile, buf)
+}
+
+func (h *handler) generateServer() error {
+	buf, err := h.renderFromTemplate(serverTemplateName)
+	if err != nil {
+		return err
+	}
+
+	endpointFile := path.Join(h.opts.Path, serverFileName)
+
+	log.Println("Formatting ", serverFileName)
 	buf, err = imports.Process(endpointFile, buf, nil)
 	return h.writeToFile(endpointFile, buf)
 }

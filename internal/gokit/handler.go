@@ -27,5 +27,9 @@ func (h *handler) do() error {
 		return err
 	}
 
+	if err := h.generateServer(); err != nil {
+		return err
+	}
+
 	return nil
 }

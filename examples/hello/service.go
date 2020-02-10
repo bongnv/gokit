@@ -4,7 +4,8 @@ import "context"
 
 // Service is a simple interface for a service.
 type Service interface {
-	Hello(ctx context.Context, p HelloRequest) (HelloResponse, error)
+	Hello(ctx context.Context, p *HelloRequest) (*HelloResponse, error)
+	Bye(ctx context.Context, req *ByeRequest) (*ByeResponse, error)
 }
 
 // HelloRequest presents a request.
@@ -14,5 +15,15 @@ type HelloRequest struct {
 
 // HelloResponse ...
 type HelloResponse struct {
+	Text string `json:"text"`
+}
+
+// ByeRequest presents a request.
+type ByeRequest struct {
+	Name string `json:"name"`
+}
+
+// HelloResponse ...
+type ByeResponse struct {
 	Text string `json:"text"`
 }

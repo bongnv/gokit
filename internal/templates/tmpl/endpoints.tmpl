@@ -1,7 +1,7 @@
 {{- $packageName := .PackageName }}
 {{- $serviceInterface := printf "%s.Service" .PackageName -}}
 
-package server
+package endpoint
 
 import (
 	"context"
@@ -31,7 +31,7 @@ func MakeServerEndpoints(s {{ $serviceInterface }}) Endpoints {
 // make{{ $endpoint.Name }}Endpoint returns an endpoint via the passed service.
 func make{{ $endpoint.Name }}Endpoint(s {{ $serviceInterface }}) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-	{{- $requestType := replace (index $endpoint.Params 1).Type "*" (concat "*" $packageName ".") }}
+	{{- $requestType := (index $endpoint.Params 1).Type }}
 		req := request.({{ $requestType }})
 		resp, e := s.{{ $endpoint.Name }}(ctx, req)
 		return resp, e

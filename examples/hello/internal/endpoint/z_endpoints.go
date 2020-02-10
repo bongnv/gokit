@@ -1,4 +1,4 @@
-package server
+package endpoint
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 // Endpoints ...
 type Endpoints struct {
 	HelloEndpoint endpoint.Endpoint
+	ByeEndpoint   endpoint.Endpoint
 }
 
 // MakeServerEndpoints returns an Endpoints struct where each endpoint invokes
@@ -17,14 +18,24 @@ type Endpoints struct {
 func MakeServerEndpoints(s hello.Service) Endpoints {
 	return Endpoints{
 		HelloEndpoint: makeHelloEndpoint(s),
+		ByeEndpoint:   makeByeEndpoint(s),
 	}
 }
 
 // makeHelloEndpoint returns an endpoint via the passed service.
 func makeHelloEndpoint(s hello.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		req := request.(hello.HelloRequest)
+		req := request.(*hello.HelloRequest)
 		resp, e := s.Hello(ctx, req)
+		return resp, e
+	}
+}
+
+// makeByeEndpoint returns an endpoint via the passed service.
+func makeByeEndpoint(s hello.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(*hello.ByeRequest)
+		resp, e := s.Bye(ctx, req)
 		return resp, e
 	}
 }

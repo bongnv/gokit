@@ -25,9 +25,11 @@ type Import struct {
 
 // Endpoint includes details of an endpoint.
 type Endpoint struct {
-	Name    string
-	Params  []Field
-	Results []Field
+	Name     string
+	Method   string
+	HTTPPath string
+	Params   []Field
+	Results  []Field
 }
 
 // Service includes details of a service.
@@ -119,14 +121,14 @@ func (p *serviceParser) parseService() (*Service, error) {
 	s := &Service{
 		Package:     p.pkg.PkgPath,
 		PackageName: p.packageName,
-		Endpoints:   p.parseEndpointsFrom(),
+		Endpoints:   p.parseEndpoints(),
 		Imports:     extractImports(p.f),
 	}
 
 	return s, nil
 }
 
-func (p *serviceParser) parseEndpointsFrom() []Endpoint {
+func (p *serviceParser) parseEndpoints() []Endpoint {
 	var methods []Endpoint
 	for _, method := range p.serviceType.Methods.List {
 		fnType, ok := method.Type.(*ast.FuncType)
@@ -138,9 +140,10 @@ func (p *serviceParser) parseEndpointsFrom() []Endpoint {
 		results := p.extractFieldsFromAst(fnType.Results.List)
 
 		methods = append(methods, Endpoint{
-			Name:    method.Names[0].Name,
-			Params:  params,
-			Results: results,
+			Name:     method.Names[0].Name,
+			HTTPPath: "/" + method.Names[0].Name,
+			Params:   params,
+			Results:  results,
 		})
 	}
 

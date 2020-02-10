@@ -40,6 +40,6 @@ type Person struct {
 		f:           srcAST,
 		packageName: srcAST.Name.Name,
 	}
-	endpoints := p.parseEndpointsFrom()
+	endpoints := p.parseEndpoints()
 	require.Len(t, endpoints, 1)
 }

@@ -1,0 +1,53 @@
+{{- $packageName := .PackageName }}
+{{- $serviceInterface := printf "%s.Service" .PackageName -}}
+
+package server
+
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+
+	"github.com/bongnv/gokit/util/httpserver"
+	"github.com/bongnv/gokit/util/server"
+	"{{ .Package }}"
+	"{{ .Package }}/internal/endpoint"
+)
+
+// Serve ...
+func Serve(ctx context.Context, s {{ $serviceInterface }}, opts ...server.Option) error {
+	serverEndpoints := endpoint.MakeServerEndpoints(s)
+
+	opts = append(opts, getHTTPOptions(serverEndpoints)...)
+
+	return server.Serve(ctx, opts...)
+}
+
+func getHTTPOptions(serverEndpoints endpoint.Endpoints) []server.Option {
+	opts := []server.Option{}
+
+	opts = append(opts,
+    {{range $endpoint := .Endpoints -}}
+        server.WithHTTPEndpoint(httpserver.Endpoint{
+            Method:         "{{ $endpoint.Method }}",
+            Path:           "{{ $endpoint.HTTPPath }}",
+            Endpoint:       serverEndpoints.{{ $endpoint.Name }}Endpoint,
+            RequestDecoder: decode{{ $endpoint.Name}}Request,
+        }),
+    {{ end -}}
+	)
+
+	return opts
+}
+
+{{ range $endpoint := .Endpoints }}
+func decode{{ $endpoint.Name}}Request(_ context.Context, r *http.Request) (request interface{}, err error) {
+	{{- $requestType := (index $endpoint.Params 1).Type }}
+	var req {{ $requestType }}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, err
+	}
+
+	return req, err
+}
+{{end}}
