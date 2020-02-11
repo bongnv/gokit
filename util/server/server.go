@@ -18,7 +18,7 @@ type HTTPServer interface {
 	WithOption(opts ...httptransport.ServerOption)
 }
 
-type Option func(n *nannyImpl)
+type Option func(n *helperServer)
 
 // Serve is the single entry to start serving servers.
 func Serve(opts ...Option) error {

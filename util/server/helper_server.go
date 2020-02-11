@@ -11,22 +11,22 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 )
 
-type nannyImpl struct {
+type helperServer struct {
 	httpServer    HTTPServer
 	httpEndpoints []httpserver.Endpoint
 	httpOptions   []httptransport.ServerOption
 	middlewares   []endpoint.Middleware
 }
 
-func getDefaultNanny() *nannyImpl {
-	return &nannyImpl{
+func getDefaultNanny() *helperServer {
+	return &helperServer{
 		httpServer:    httpserver.New(),
 		httpEndpoints: nil,
 		httpOptions:   nil,
 	}
 }
 
-func (n *nannyImpl) getServers() []server {
+func (n *helperServer) getServers() []server {
 	servers := []server{}
 	if n.httpServer != nil {
 		servers = append(servers, n.httpServer)
@@ -35,7 +35,7 @@ func (n *nannyImpl) getServers() []server {
 	return servers
 }
 
-func (n *nannyImpl) initServers() error {
+func (n *helperServer) initServers() error {
 	n.httpServer.WithEndpoint(n.httpEndpoints...)
 	n.httpServer.WithOption(n.httpOptions...)
 
@@ -48,7 +48,7 @@ func (n *nannyImpl) initServers() error {
 	return nil
 }
 
-func (n *nannyImpl) startServers() {
+func (n *helperServer) startServers() {
 	var wg sync.WaitGroup
 	for _, s := range n.getServers() {
 		wg.Add(1)
@@ -63,27 +63,38 @@ func (n *nannyImpl) startServers() {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		shutdownCh := make(chan os.Signal, 1)
-		signal.Notify(shutdownCh, syscall.SIGINT, syscall.SIGTERM)
-		<-shutdownCh
-		signal.Stop(shutdownCh)
+		n.waitForStopSignal()
 		n.stopServers()
 	}()
 
 	wg.Wait()
 }
 
-func (n *nannyImpl) stopServers() {
+// waitForStopSignal blocks goroutine until there is a shutdown signal.
+func (n *helperServer) waitForStopSignal() {
+	shutdownCh := make(chan os.Signal, 1)
+	signal.Notify(shutdownCh, syscall.SIGINT, syscall.SIGTERM)
+	<-shutdownCh
+	signal.Stop(shutdownCh)
+}
+
+func (n *helperServer) stopServers() {
+	var wg sync.WaitGroup
+
 	for _, s := range n.getServers() {
+		wg.Add(1)
 		go func() {
+			defer wg.Done()
 			if err := s.Stop(); err != nil {
 				// TODO: log errors
 			}
 		}()
 	}
+
+	wg.Wait()
 }
 
-func (n *nannyImpl) run() error {
+func (n *helperServer) run() error {
 	if err := n.initServers(); err != nil {
 		return err
 	}
