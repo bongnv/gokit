@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 
 	"github.com/bongnv/gokit/examples/hello/internal/handlers"
@@ -9,11 +8,9 @@ import (
 )
 
 func main() {
-	err := server.Serve(context.Background(),
+	err := server.Serve(
 		handlers.New(),
 	)
 
-	if err != nil {
-		log.Println(err)
-	}
+	log.Println("Service stopped with:", err)
 }

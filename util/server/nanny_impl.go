@@ -1,8 +1,10 @@
 package server
 
 import (
-	"context"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 
 	"github.com/bongnv/gokit/util/httpserver"
 	"github.com/go-kit/kit/endpoint"
@@ -33,12 +35,12 @@ func (n *nannyImpl) getServers() []server {
 	return servers
 }
 
-func (n *nannyImpl) Init(ctx context.Context) error {
+func (n *nannyImpl) initServers() error {
 	n.httpServer.WithEndpoint(n.httpEndpoints...)
 	n.httpServer.WithOption(n.httpOptions...)
 
 	for _, s := range n.getServers() {
-		if err := s.Init(ctx); err != nil {
+		if err := s.Init(); err != nil {
 			return err
 		}
 	}
@@ -46,33 +48,46 @@ func (n *nannyImpl) Init(ctx context.Context) error {
 	return nil
 }
 
-func (n *nannyImpl) Serve(ctx context.Context) {
+func (n *nannyImpl) startServers() {
 	var wg sync.WaitGroup
 	for _, s := range n.getServers() {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			s.Serve(ctx)
+			if err := s.Serve(); err != nil {
+				// TODO: log errors
+			}
 		}()
 	}
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		shutdownCh := make(chan os.Signal, 1)
+		signal.Notify(shutdownCh, syscall.SIGINT, syscall.SIGTERM)
+		<-shutdownCh
+		signal.Stop(shutdownCh)
+		n.stopServers()
+	}()
+
 	wg.Wait()
 }
 
-func (n *nannyImpl) Stop() error {
+func (n *nannyImpl) stopServers() {
 	for _, s := range n.getServers() {
-		if err := s.Stop(); err != nil {
-			return err
-		}
+		go func() {
+			if err := s.Stop(); err != nil {
+				// TODO: log errors
+			}
+		}()
 	}
-
-	return nil
 }
 
-func (n *nannyImpl) Run(ctx context.Context) error {
-	if err := n.Init(ctx); err != nil {
+func (n *nannyImpl) run() error {
+	if err := n.initServers(); err != nil {
 		return err
 	}
 
-	n.Serve(ctx)
+	n.startServers()
 	return nil
 }
