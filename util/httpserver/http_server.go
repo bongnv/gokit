@@ -33,7 +33,19 @@ func New() *Server {
 	return &Server{}
 }
 
-func (s *Server) Init(ctx context.Context) error {
+func (s *Server) Init() error {
+	s.initializeHandler()
+
+	httpListener, err := net.Listen("tcp", s.httpAddress)
+	if err != nil {
+		return err
+	}
+
+	s.httpListener = httpListener
+	return nil
+}
+
+func (s *Server) initializeHandler() {
 	r := mux.NewRouter()
 
 	for _, e := range s.endpoints {
@@ -56,17 +68,10 @@ func (s *Server) Init(ctx context.Context) error {
 	}
 
 	s.httpHandler = r
-	httpListener, err := net.Listen("tcp", s.httpAddress)
-	if err != nil {
-		return err
-	}
-
-	s.httpListener = httpListener
-	return nil
 }
 
-func (s *Server) Serve(ctx context.Context) {
-	_ = http.Serve(s.httpListener, s.httpHandler)
+func (s *Server) Serve() error {
+	return http.Serve(s.httpListener, s.httpHandler)
 }
 
 func (s *Server) Stop() error {
@@ -84,6 +89,7 @@ func (s *Server) WithOption(opts ...httptransport.ServerOption) {
 // encodeHTTPGenericResponse is a transport/http.EncodeResponseFunc that encodes
 // the response as JSON to the response writer. Primarily useful in a server.
 func encodeHTTPGenericResponse(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+	// TODO: remove hard-coded content-type
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	return json.NewEncoder(w).Encode(response)
 }

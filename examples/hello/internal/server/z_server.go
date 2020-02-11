@@ -12,12 +12,12 @@ import (
 )
 
 // Serve ...
-func Serve(ctx context.Context, s hello.Service, opts ...server.Option) error {
+func Serve(s hello.Service, opts ...server.Option) error {
 	serverEndpoints := endpoint.MakeServerEndpoints(s)
 
 	opts = append(opts, getHTTPOptions(serverEndpoints)...)
 
-	return server.Serve(ctx, opts...)
+	return server.Serve(opts...)
 }
 
 func getHTTPOptions(serverEndpoints endpoint.Endpoints) []server.Option {
