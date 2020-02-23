@@ -1,4 +1,4 @@
-package gokit
+package command
 
 import (
 	"strings"
