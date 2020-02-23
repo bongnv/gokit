@@ -10,6 +10,7 @@ import (
 
 type scaffoldCmd struct {
 	dir string
+	pkg string
 }
 
 func (*scaffoldCmd) Name() string     { return "scaffold" }
@@ -22,9 +23,14 @@ func (*scaffoldCmd) Usage() string {
 
 func (c *scaffoldCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&c.dir, "directory", ".", "Director to scaffold")
+	f.StringVar(&c.pkg, "pkg", "github.com/hello", "Package name")
 }
 
 func (c *scaffoldCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
 	fmt.Println("Running scaffold cmd in ", c.dir)
 	return subcommands.ExitSuccess
+}
+
+func (c *scaffoldCmd) generateMain() {
+
 }

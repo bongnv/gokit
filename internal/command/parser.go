@@ -1,7 +1,6 @@
-package gokit
+package command
 
 import (
-	"errors"
 	"fmt"
 	"go/ast"
 	"strings"
@@ -38,76 +37,6 @@ type Service struct {
 	Package     string
 	PackageName string
 	Imports     []*Import
-}
-
-func (h *handler) parseSource() error {
-	pkgs, err := parsePackages(h.opts.Path)
-	if err != nil {
-		return err
-	}
-
-	s, err := h.parseServiceData(pkgs)
-	if err != nil {
-		return err
-	}
-
-	h.service = s
-	return nil
-}
-
-func parsePackages(path string) ([]*packages.Package, error) {
-	parseMode := packages.NeedName |
-		packages.NeedFiles |
-		packages.NeedImports |
-		packages.NeedDeps |
-		packages.NeedCompiledGoFiles |
-		packages.NeedTypes |
-		packages.NeedSyntax |
-		packages.NeedTypesInfo
-
-	return packages.Load(
-		&packages.Config{
-			Mode: parseMode,
-		},
-		path,
-	)
-}
-
-func (h *handler) parseServiceData(pkgs []*packages.Package) (*Service, error) {
-	for _, pkg := range pkgs {
-		for _, f := range pkg.Syntax {
-			for _, decl := range f.Decls {
-				if decl, ok := decl.(*ast.GenDecl); ok {
-					for _, spec := range decl.Specs {
-						spec, ok := spec.(*ast.TypeSpec)
-						if !ok {
-							continue
-						}
-
-						sType, ok := spec.Type.(*ast.InterfaceType)
-						if !ok {
-							continue
-						}
-
-						if spec.Name.Name != interfaceName {
-							continue
-						}
-
-						p := &serviceParser{
-							f:           f,
-							packageName: f.Name.Name,
-							serviceType: sType,
-							pkg:         pkg,
-						}
-
-						return p.parseService()
-					}
-				}
-			}
-		}
-	}
-
-	return nil, errors.New("serviceParser: no service found")
 }
 
 type serviceParser struct {
