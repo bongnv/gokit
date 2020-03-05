@@ -55,7 +55,7 @@ func (c *scaffoldCmd) do() error {
 		Package:     c.pkg,
 	}
 
-	tasks := []task{
+	tasks := taskGroup{
 		&fileGenerator{
 			filePath:     path.Join(c.dir, serviceFileName),
 			templateName: serviceTemplateName,
@@ -79,11 +79,5 @@ func (c *scaffoldCmd) do() error {
 		},
 	}
 
-	for _, t := range tasks {
-		if err := t.do(); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return tasks.do()
 }

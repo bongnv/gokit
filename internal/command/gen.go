@@ -23,10 +23,6 @@ var (
 	serverFileName    = path.Join(internalFolder, "server", "z_server.go")
 )
 
-type task interface {
-	do() error
-}
-
 type genCmd struct {
 	path string
 }
@@ -59,7 +55,7 @@ func (c *genCmd) do() error {
 	}
 
 	writer := &fileWriter{}
-	tasks := []task{
+	tasks := taskGroup{
 		&fileGenerator{
 			filePath:     path.Join(c.path, endpointsFileName),
 			templateName: endpointsTemplateName,
@@ -74,13 +70,7 @@ func (c *genCmd) do() error {
 		},
 	}
 
-	for _, t := range tasks {
-		if err := t.do(); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return tasks.do()
 }
 
 func (c *genCmd) parseSource() (*Service, error) {
