@@ -1,0 +1,22 @@
+package handlers
+
+import (
+	"context"
+
+	"{{ .Package }}"
+)
+
+type handlerImpl struct {
+}
+
+func (h *handlerImpl) Hello(ctx context.Context, req *{{ .PackageName }}.HelloRequest) (*{{ .PackageName }}.HelloResponse, error) {
+	return nil, nil
+}
+
+func (h *handlerImpl) Bye(ctx context.Context, req *{{ .PackageName }}.ByeRequest) (*{{ .PackageName }}.ByeResponse, error) {
+	return nil, nil
+}
+
+func New() {{ .PackageName }}.Service {
+	return &handlerImpl{}
+}

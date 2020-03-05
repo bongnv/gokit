@@ -28,6 +28,7 @@ func (g *fileGenerator) do() error {
 	buf, err = imports.Process(g.filePath, buf, nil)
 	return g.writer.Write(g.filePath, buf)
 }
+
 func (g *fileGenerator) renderFromTemplate() ([]byte, error) {
 	log.Printf("Rendering from template %s..\n", endpointsTemplateName)
 

@@ -4,8 +4,21 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"path"
 
 	"github.com/google/subcommands"
+)
+
+const (
+	mainTemplateName     = "main"
+	handlersTemplateName = "handlers"
+	serviceTemplateName  = "service"
+)
+
+var (
+	mainFileName     = path.Join("cmd", "server", "main.go")
+	handlersFileName = path.Join("internal", "handlers", "service.go")
+	serviceFileName  = "service.go"
 )
 
 type scaffoldCmd struct {
@@ -27,10 +40,50 @@ func (c *scaffoldCmd) SetFlags(f *flag.FlagSet) {
 }
 
 func (c *scaffoldCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
-	fmt.Println("Running scaffold cmd in ", c.dir)
+	if err := c.do(); err != nil {
+		fmt.Println("Executed with err:", err)
+		return subcommands.ExitFailure
+	}
+
 	return subcommands.ExitSuccess
 }
 
-func (c *scaffoldCmd) generateMain() {
+func (c *scaffoldCmd) do() error {
+	writer := &fileWriter{}
+	serviceInfo := &Service{
+		PackageName: path.Base(c.pkg),
+		Package:     c.pkg,
+	}
 
+	tasks := []task{
+		&fileGenerator{
+			filePath:     path.Join(c.dir, serviceFileName),
+			templateName: serviceTemplateName,
+			service:      serviceInfo,
+			writer:       writer,
+		},
+		&genCmd{
+			path: c.dir,
+		},
+		&fileGenerator{
+			filePath:     path.Join(c.dir, handlersFileName),
+			templateName: handlersTemplateName,
+			service:      serviceInfo,
+			writer:       writer,
+		},
+		&fileGenerator{
+			filePath:     path.Join(c.dir, mainFileName),
+			templateName: mainTemplateName,
+			service:      serviceInfo,
+			writer:       writer,
+		},
+	}
+
+	for _, t := range tasks {
+		if err := t.do(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

@@ -1,0 +1,16 @@
+package main
+
+import (
+	"log"
+
+	"{{ .Package }}/internal/handlers"
+	"{{ .Package }}/internal/server"
+)
+
+func main() {
+	err := server.Serve(
+		handlers.New(),
+	)
+
+	log.Println("Service stopped with:", err)
+}
