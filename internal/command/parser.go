@@ -31,6 +31,7 @@ type Endpoint struct {
 
 // Service includes details of a service.
 type Service struct {
+	Name        string
 	Endpoints   []Endpoint
 	Package     string
 	PackageName string
@@ -42,10 +43,12 @@ type serviceParser struct {
 	f           *ast.File
 	serviceType *ast.InterfaceType
 	packageName string
+	serviceName string
 }
 
 func (p *serviceParser) parseService() (*Service, error) {
 	s := &Service{
+		Name:        p.serviceName,
 		Package:     p.pkg.PkgPath,
 		PackageName: p.packageName,
 		Endpoints:   p.parseEndpoints(),

@@ -124,6 +124,7 @@ func (c *genCmd) parseServiceData(pkgs []*packages.Package) (*Service, error) {
 						}
 
 						p := &serviceParser{
+							serviceName: c.interfaceName,
 							f:           f,
 							packageName: f.Name.Name,
 							serviceType: sType,

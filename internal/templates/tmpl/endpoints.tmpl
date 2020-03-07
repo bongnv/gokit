@@ -1,5 +1,6 @@
 {{- $packageName := .PackageName }}
-{{- $serviceInterface := printf "%s.Service" .PackageName -}}
+{{- $serviceInterface := printf "%s.%s" .PackageName .Name -}}
+{{- $serviceName := .Name }}
 
 package endpoint
 
@@ -10,26 +11,26 @@ import (
 	"{{ .Package }}"
 )
 
-// Endpoints ...
-type Endpoints struct {
+// {{ .Name }}Endpoints ...
+type {{ .Name }}Endpoints struct {
 {{ range $endpoint := .Endpoints }}
 	{{- $endpoint.Name }}Endpoint endpoint.Endpoint
 {{ end -}}
 }
 
-// MakeServerEndpoints returns an Endpoints struct where each endpoint invokes
+// Make{{ .Name }}Endpoints returns an Endpoints struct where each endpoint invokes
 // the corresponding method on the provided service.
-func MakeServerEndpoints(s {{ $serviceInterface }}) Endpoints {
-	return Endpoints{
+func Make{{ .Name }}Endpoints(s {{ $serviceInterface }}) {{ .Name }}Endpoints {
+	return {{ .Name }}Endpoints{
 	{{ range $endpoint := .Endpoints }}
-		{{- $endpoint.Name }}Endpoint: make{{ $endpoint.Name }}Endpoint(s),
+		{{- $endpoint.Name }}Endpoint: make{{ $serviceName }}{{ $endpoint.Name }}Endpoint(s),
 	{{ end -}}
 	}
 }
 
 {{ range $endpoint := .Endpoints }}
 // make{{ $endpoint.Name }}Endpoint returns an endpoint via the passed service.
-func make{{ $endpoint.Name }}Endpoint(s {{ $serviceInterface }}) endpoint.Endpoint {
+func make{{ $serviceName }}{{ $endpoint.Name }}Endpoint(s {{ $serviceInterface }}) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 	{{- $requestType := (index $endpoint.Params 1).Type }}
 		req := request.({{ $requestType }})
