@@ -9,7 +9,7 @@ import (
 type handlerImpl struct {
 }
 
-func (h *handlerImpl) Hello(ctx context.Context, req *hello.HelloRequest) (*hello.HelloResponse, error) {
+func (h *handlerImpl) Hello(ctx context.Context, req *hello.Request) (*hello.Response, error) {
 	return nil, nil
 }
 
@@ -17,6 +17,7 @@ func (h *handlerImpl) Bye(ctx context.Context, req *hello.ByeRequest) (*hello.By
 	return nil, nil
 }
 
+// New creates a new service with business logic.
 func New() hello.Service {
 	return &handlerImpl{}
 }

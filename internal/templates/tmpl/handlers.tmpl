@@ -9,7 +9,7 @@ import (
 type handlerImpl struct {
 }
 
-func (h *handlerImpl) Hello(ctx context.Context, req *{{ .PackageName }}.HelloRequest) (*{{ .PackageName }}.HelloResponse, error) {
+func (h *handlerImpl) Hello(ctx context.Context, req *{{ .PackageName }}.Request) (*{{ .PackageName }}.Response, error) {
 	return nil, nil
 }
 
@@ -17,6 +17,7 @@ func (h *handlerImpl) Bye(ctx context.Context, req *{{ .PackageName }}.ByeReques
 	return nil, nil
 }
 
+// New creates a new service with business logic.
 func New() {{ .PackageName }}.Service {
 	return &handlerImpl{}
 }

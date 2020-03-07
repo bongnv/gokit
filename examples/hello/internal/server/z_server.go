@@ -26,13 +26,13 @@ func getHTTPOptions(serverEndpoints endpoint.Endpoints) []server.Option {
 	opts = append(opts,
 		server.WithHTTPEndpoint(httpserver.Endpoint{
 			Method:         "",
-			Path:           "/Hello",
+			Path:           "/hello",
 			Endpoint:       serverEndpoints.HelloEndpoint,
 			RequestDecoder: decodeHelloRequest,
 		}),
 		server.WithHTTPEndpoint(httpserver.Endpoint{
 			Method:         "",
-			Path:           "/Bye",
+			Path:           "/bye",
 			Endpoint:       serverEndpoints.ByeEndpoint,
 			RequestDecoder: decodeByeRequest,
 		}),
@@ -42,7 +42,7 @@ func getHTTPOptions(serverEndpoints endpoint.Endpoints) []server.Option {
 }
 
 func decodeHelloRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
-	var req *hello.HelloRequest
+	var req *hello.Request
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
 	}
