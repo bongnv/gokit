@@ -11,13 +11,15 @@ import (
 	"github.com/bongnv/gokit/util/server"
 )
 
-// Serve ...
-func Serve(s hello.Service, opts ...server.Option) error {
+// GetServiceOptions ...
+func GetServiceOptions(s hello.Service) []server.Option {
 	serverEndpoints := endpoint.MakeServerEndpoints(s)
+
+	opts := []server.Option{}
 
 	opts = append(opts, getHTTPOptions(serverEndpoints)...)
 
-	return server.Serve(opts...)
+	return opts
 }
 
 func getHTTPOptions(serverEndpoints endpoint.Endpoints) []server.Option {

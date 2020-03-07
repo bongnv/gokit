@@ -19,7 +19,7 @@ const (
 
 var (
 	mainFileName     = path.Join("cmd", "server", "main.go")
-	handlersFileName = path.Join("internal", "handlers", "service.go")
+	handlersFileName = path.Join("internal", "handlers", "handlers.go")
 	serviceFileName  = "service.go"
 )
 
@@ -78,7 +78,8 @@ func (c *scaffoldCmd) Do() error {
 			writer:       writer,
 		},
 		&genCmd{
-			path: c.dir,
+			path:          c.dir,
+			interfaceName: "Service",
 		},
 		&fileGenerator{
 			filePath:     path.Join(c.dir, handlersFileName),

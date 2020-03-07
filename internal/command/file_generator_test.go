@@ -38,13 +38,17 @@ package main
 import (
 	"log"
 
+	gokitServer "github.com/bongnv/gokit/util/server"
 	"github.com/hello/internal/handlers"
 	"github.com/hello/internal/server"
 )
 
 func main() {
-	err := server.Serve(
-		handlers.New(),
+	opts := []gokitServer.Option{}
+	opts = append(opts, server.GetServiceOptions(handlers.New())...)
+
+	err := gokitServer.Serve(
+		opts...,
 	)
 
 	log.Println("Service stopped with:", err)

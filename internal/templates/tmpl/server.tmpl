@@ -14,13 +14,15 @@ import (
 	"{{ .Package }}/internal/endpoint"
 )
 
-// Serve ...
-func Serve(s {{ $serviceInterface }}, opts ...server.Option) error {
+// GetServiceOptions ...
+func GetServiceOptions(s {{ $packageName }}.Service) []server.Option {
 	serverEndpoints := endpoint.MakeServerEndpoints(s)
 
-	opts = append(opts, getHTTPOptions(serverEndpoints)...)
+	opts := []server.Option{}
 
-	return server.Serve(opts...)
+	opts = append(opts,getHTTPOptions(serverEndpoints)...,)
+
+	return opts
 }
 
 func getHTTPOptions(serverEndpoints endpoint.Endpoints) []server.Option {

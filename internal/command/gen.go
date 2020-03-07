@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"go/ast"
 	"path"
+	"strings"
 
 	"github.com/bongnv/gokit/internal/task"
 	"github.com/google/subcommands"
@@ -16,16 +17,16 @@ import (
 const (
 	endpointsTemplateName = "endpoints"
 	serverTemplateName    = "server"
+	defaultInterfaceName  = "Service"
 )
 
 var (
-	internalFolder    = "internal"
-	endpointsFileName = path.Join(internalFolder, "endpoint", "z_endpoints.go")
-	serverFileName    = path.Join(internalFolder, "server", "z_server.go")
+	internalFolder = "internal"
 )
 
 type genCmd struct {
-	path string
+	path          string
+	interfaceName string
 }
 
 func (*genCmd) Name() string     { return "gen" }
@@ -38,6 +39,7 @@ func (*genCmd) Usage() string {
 
 func (c *genCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&c.path, "directory", ".", "root path of a go-kit project")
+	f.StringVar(&c.interfaceName, "interface", defaultInterfaceName, "service interface")
 }
 
 func (c *genCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
@@ -58,13 +60,13 @@ func (c *genCmd) Do() error {
 	writer := &fileWriter{}
 	tasks := task.Group{
 		&fileGenerator{
-			filePath:     path.Join(c.path, endpointsFileName),
+			filePath:     c.getFilePath("endpoint", endpointsTemplateName),
 			templateName: endpointsTemplateName,
 			service:      s,
 			writer:       writer,
 		},
 		&fileGenerator{
-			filePath:     path.Join(c.path, serverFileName),
+			filePath:     c.getFilePath("server", serverTemplateName),
 			templateName: serverTemplateName,
 			service:      s,
 			writer:       writer,
@@ -117,7 +119,7 @@ func (c *genCmd) parseServiceData(pkgs []*packages.Package) (*Service, error) {
 							continue
 						}
 
-						if spec.Name.Name != interfaceName {
+						if spec.Name.Name != c.interfaceName {
 							continue
 						}
 
@@ -136,4 +138,9 @@ func (c *genCmd) parseServiceData(pkgs []*packages.Package) (*Service, error) {
 	}
 
 	return nil, errors.New("serviceParser: no service found")
+}
+
+func (c *genCmd) getFilePath(dir, templateName string) string {
+	fileName := "z_" + strings.ToLower(c.interfaceName) + "_" + templateName + ".go"
+	return path.Join(c.path, internalFolder, dir, fileName)
 }
