@@ -26,12 +26,17 @@ func (g *fileGenerator) Do() error {
 	}
 
 	log.Println("Formatting ", filepath.Base(g.filePath))
-	buf, err = imports.Process(g.filePath, buf, nil)
-	return g.writer.Write(g.filePath, buf)
+	formatedBuf, err := imports.Process(g.filePath, buf, nil)
+	if err != nil {
+		fmt.Println("Failed to format. Content:", string(buf))
+		return err
+	}
+
+	return g.writer.Write(g.filePath, formatedBuf)
 }
 
 func (g *fileGenerator) renderFromTemplate() ([]byte, error) {
-	log.Printf("Rendering from template %s..\n", endpointsTemplateName)
+	log.Printf("Rendering from template %s..\n", g.templateName)
 
 	templatePath := fmt.Sprintf("tmpl/%s.tmpl", g.templateName)
 	tmplContent, err := templates.Asset(templatePath)

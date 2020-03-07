@@ -1,5 +1,6 @@
 {{- $packageName := .PackageName }}
-{{- $serviceInterface := printf "%s.Service" .PackageName -}}
+{{- $serviceInterface := printf "%s.%s" .PackageName .Name -}}
+{{- $serviceName := .Name }}
 
 package server
 
@@ -14,18 +15,18 @@ import (
 	"{{ .Package }}/internal/endpoint"
 )
 
-// GetServiceOptions ...
-func GetServiceOptions(s {{ $packageName }}.Service) []server.Option {
-	serverEndpoints := endpoint.MakeServerEndpoints(s)
+// Get{{ .Name }}Options ...
+func Get{{ .Name }}Options(s {{ $serviceInterface  }}) []server.Option {
+	serverEndpoints := endpoint.Make{{ .Name }}Endpoints(s)
 
 	opts := []server.Option{}
 
-	opts = append(opts,getHTTPOptions(serverEndpoints)...,)
+	opts = append(opts,get{{ .Name }}HTTPOptions(serverEndpoints)...,)
 
 	return opts
 }
 
-func getHTTPOptions(serverEndpoints endpoint.Endpoints) []server.Option {
+func get{{ .Name }}HTTPOptions(serverEndpoints endpoint.{{ .Name }}Endpoints) []server.Option {
 	opts := []server.Option{}
 
 	opts = append(opts,
@@ -34,7 +35,7 @@ func getHTTPOptions(serverEndpoints endpoint.Endpoints) []server.Option {
             Method:         "{{ $endpoint.Method }}",
             Path:           "{{ $endpoint.HTTPPath }}",
             Endpoint:       serverEndpoints.{{ $endpoint.Name }}Endpoint,
-            RequestDecoder: decode{{ $endpoint.Name}}Request,
+            RequestDecoder: decode{{ $serviceName }}{{ $endpoint.Name}}Request,
         }),
     {{ end -}}
 	)
@@ -43,7 +44,7 @@ func getHTTPOptions(serverEndpoints endpoint.Endpoints) []server.Option {
 }
 
 {{ range $endpoint := .Endpoints }}
-func decode{{ $endpoint.Name}}Request(_ context.Context, r *http.Request) (request interface{}, err error) {
+func decode{{ $serviceName }}{{ $endpoint.Name}}Request(_ context.Context, r *http.Request) (request interface{}, err error) {
 	{{- $requestType := (index $endpoint.Params 1).Type }}
 	var req {{ $requestType }}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
