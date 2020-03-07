@@ -52,9 +52,10 @@ func (n *helperServer) startServers() {
 	var wg sync.WaitGroup
 	for _, s := range n.getServers() {
 		wg.Add(1)
+		serviceClone := s
 		go func() {
 			defer wg.Done()
-			if err := s.Serve(); err != nil {
+			if err := serviceClone.Serve(); err != nil {
 				// TODO: log errors
 			}
 		}()
@@ -83,9 +84,10 @@ func (n *helperServer) stopServers() {
 
 	for _, s := range n.getServers() {
 		wg.Add(1)
+		serviceClone := s
 		go func() {
 			defer wg.Done()
-			if err := s.Stop(); err != nil {
+			if err := serviceClone.Stop(); err != nil {
 				// TODO: log errors
 			}
 		}()

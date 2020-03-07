@@ -1,4 +1,4 @@
-// Package servicenanny provides a helper implementation to help handling multiple services.
+// Package server provides a helper implementation to help handling multiple services.
 package server
 
 import (
@@ -12,12 +12,14 @@ type server interface {
 	Stop() error
 }
 
+// HTTPServer requires method WithEndpoint and WithOption on top of a service.
 type HTTPServer interface {
 	server
 	WithEndpoint(endpoints ...httpserver.Endpoint)
 	WithOption(opts ...httptransport.ServerOption)
 }
 
+// Option presents an option to enhance server.
 type Option func(n *helperServer)
 
 // Serve is the single entry to start serving servers.

@@ -9,5 +9,10 @@ require (
 	github.com/google/subcommands v1.2.0
 	github.com/gorilla/mux v1.7.3
 	github.com/stretchr/testify v1.4.0
-	golang.org/x/tools v0.0.0-20200207224406-61798d64f025
+	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073 // indirect
+	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
+	golang.org/x/net v0.0.0-20200301022130-244492dfa37a // indirect
+	golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527 // indirect
+	golang.org/x/text v0.3.2 // indirect
+	golang.org/x/tools v0.0.0-20200306191617-51e69f71924f
 )

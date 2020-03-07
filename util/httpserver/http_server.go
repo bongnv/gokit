@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Endpoint presents an endpoint.
 type Endpoint struct {
 	Method          string
 	Path            string
@@ -29,10 +30,12 @@ type Server struct {
 	options      []httptransport.ServerOption
 }
 
+// New ...
 func New() *Server {
 	return &Server{}
 }
 
+// Init ...
 func (s *Server) Init() error {
 	s.initializeHandler()
 
@@ -70,18 +73,22 @@ func (s *Server) initializeHandler() {
 	s.httpHandler = r
 }
 
+// Serve ...
 func (s *Server) Serve() error {
 	return http.Serve(s.httpListener, s.httpHandler)
 }
 
+// Stop ...
 func (s *Server) Stop() error {
 	return s.httpListener.Close()
 }
 
+// WithEndpoint ...
 func (s *Server) WithEndpoint(endpoints ...Endpoint) {
 	s.endpoints = append(s.endpoints, endpoints...)
 }
 
+// WithOption ...
 func (s *Server) WithOption(opts ...httptransport.ServerOption) {
 	s.options = append(s.options, opts...)
 }

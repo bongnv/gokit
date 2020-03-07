@@ -12,11 +12,13 @@ const (
 	interfaceName = "Service"
 )
 
+// Field presents a field in Golang. It includes name & type.
 type Field struct {
 	Name string
 	Type string
 }
 
+// Import presents an import in Golang.
 type Import struct {
 	Path string
 	Name string
@@ -70,7 +72,7 @@ func (p *serviceParser) parseEndpoints() []Endpoint {
 
 		methods = append(methods, Endpoint{
 			Name:     method.Names[0].Name,
-			HTTPPath: "/" + method.Names[0].Name,
+			HTTPPath: "/" + strings.ToLower(method.Names[0].Name),
 			Params:   params,
 			Results:  results,
 		})
