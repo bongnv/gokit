@@ -16,3 +16,6 @@
 
 # IntellIJ files
 .idea/
+
+# vscode
+.vscode/

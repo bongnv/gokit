@@ -2,16 +2,15 @@ package command
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
-	"go/ast"
 	"path"
 	"strings"
 
+	"github.com/bongnv/gokit/internal/parser"
 	"github.com/bongnv/gokit/internal/task"
+	"github.com/bongnv/gokit/internal/writer"
 	"github.com/google/subcommands"
-	"golang.org/x/tools/go/packages"
 )
 
 const (
@@ -27,6 +26,8 @@ var (
 type genCmd struct {
 	path          string
 	interfaceName string
+	parser        parser.Parser
+	writer        writer.Writer
 }
 
 func (*genCmd) Name() string     { return "gen" }
@@ -42,7 +43,7 @@ func (c *genCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&c.interfaceName, "interface", defaultInterfaceName, "service interface")
 }
 
-func (c *genCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
+func (c *genCmd) Execute(_ context.Context, _ *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
 	if err := c.Do(); err != nil {
 		fmt.Println("Executed with err:", err)
 		return subcommands.ExitFailure
@@ -52,93 +53,38 @@ func (c *genCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) s
 }
 
 func (c *genCmd) Do() error {
-	s, err := c.parseSource()
+	if c.parser == nil {
+		c.parser = &parser.DefaultParser{
+			Path:        c.path,
+			ServiceName: c.interfaceName,
+		}
+	}
+
+	if c.writer == nil {
+		c.writer = &writer.FileWriter{}
+	}
+
+	s, err := c.parser.Parse()
 	if err != nil {
 		return err
 	}
 
-	writer := &fileWriter{}
 	tasks := task.Group{
 		&fileGenerator{
 			filePath:     c.getFilePath("endpoint", endpointsTemplateName),
 			templateName: endpointsTemplateName,
 			service:      s,
-			writer:       writer,
+			writer:       c.writer,
 		},
 		&fileGenerator{
 			filePath:     c.getFilePath("server", serverTemplateName),
 			templateName: serverTemplateName,
 			service:      s,
-			writer:       writer,
+			writer:       c.writer,
 		},
 	}
 
 	return tasks.Do()
-}
-
-func (c *genCmd) parseSource() (*Service, error) {
-	pkgs, err := parsePackages(c.path)
-	if err != nil {
-		return nil, err
-	}
-
-	return c.parseServiceData(pkgs)
-}
-
-func parsePackages(path string) ([]*packages.Package, error) {
-	parseMode := packages.NeedName |
-		packages.NeedFiles |
-		packages.NeedImports |
-		packages.NeedDeps |
-		packages.NeedCompiledGoFiles |
-		packages.NeedTypes |
-		packages.NeedSyntax |
-		packages.NeedTypesInfo
-
-	return packages.Load(
-		&packages.Config{
-			Mode: parseMode,
-		},
-		path,
-	)
-}
-
-func (c *genCmd) parseServiceData(pkgs []*packages.Package) (*Service, error) {
-	for _, pkg := range pkgs {
-		for _, f := range pkg.Syntax {
-			for _, decl := range f.Decls {
-				if decl, ok := decl.(*ast.GenDecl); ok {
-					for _, spec := range decl.Specs {
-						spec, ok := spec.(*ast.TypeSpec)
-						if !ok {
-							continue
-						}
-
-						sType, ok := spec.Type.(*ast.InterfaceType)
-						if !ok {
-							continue
-						}
-
-						if spec.Name.Name != c.interfaceName {
-							continue
-						}
-
-						p := &serviceParser{
-							serviceName: c.interfaceName,
-							f:           f,
-							packageName: f.Name.Name,
-							serviceType: sType,
-							pkg:         pkg,
-						}
-
-						return p.parseService()
-					}
-				}
-			}
-		}
-	}
-
-	return nil, errors.New("serviceParser: no service found")
 }
 
 func (c *genCmd) getFilePath(dir, templateName string) string {

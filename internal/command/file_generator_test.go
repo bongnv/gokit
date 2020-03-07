@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/bongnv/gokit/internal/parser"
 	"github.com/stretchr/testify/require"
 )
 
@@ -22,7 +23,7 @@ func Test_fileGenerator(t *testing.T) {
 	generator := &fileGenerator{
 		filePath:     "main.go",
 		templateName: "main",
-		service: &Service{
+		service: &parser.Service{
 			Package:     "github.com/hello",
 			PackageName: "hello",
 		},
