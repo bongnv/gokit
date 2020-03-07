@@ -7,15 +7,17 @@ import (
 	"path/filepath"
 	"text/template"
 
+	"github.com/bongnv/gokit/internal/parser"
 	"github.com/bongnv/gokit/internal/templates"
+	"github.com/bongnv/gokit/internal/writer"
 	"golang.org/x/tools/imports"
 )
 
 type fileGenerator struct {
 	filePath     string
 	templateName string
-	service      *Service
-	writer       writer
+	service      *parser.Service
+	writer       writer.Writer
 }
 
 // Do generates a file given a template. Then, it uses writer to render output.

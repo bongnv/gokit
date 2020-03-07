@@ -1,17 +1,20 @@
-package command
+package writer
 
 import (
 	"os"
 	"path/filepath"
 )
 
-type writer interface {
+// Writer is an interface to wrap Write method.
+//go:generate mockery -name=Writer -inpkg -case=underscore
+type Writer interface {
 	Write(path string, data []byte) error
 }
 
-type fileWriter struct{}
+// FileWriter is an implementation of Writer to file to file.
+type FileWriter struct{}
 
-func (fw *fileWriter) Write(path string, data []byte) error {
+func (fw *FileWriter) Write(path string, data []byte) error {
 	if err := fw.ensurePath(filepath.Dir(path)); err != nil {
 		return err
 	}
@@ -30,7 +33,7 @@ func (fw *fileWriter) Write(path string, data []byte) error {
 	return err
 }
 
-func (fw *fileWriter) ensurePath(path string) error {
+func (fw *FileWriter) ensurePath(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return os.MkdirAll(path, os.ModePerm)
 	}
