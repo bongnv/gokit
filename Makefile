@@ -12,14 +12,13 @@ lint:
 	@echo "  Running go vet..."
 	go vet ./...
 	@echo "  Running golint..."
-	golint -set_exit_status=1 ./...
+	${GOPATH}/bin/golint -set_exit_status=1 ./...
 
 build: 
 	go build -v ./...
 
 install-tools:
 	@echo ">  Installing tools..."
-	export PATH=$PATH:$(go env GOPATH)/bin
 	go get -u golang.org/x/lint/golint
 
 ci: install-tools lint test-coverage
