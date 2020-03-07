@@ -18,7 +18,8 @@ type fileGenerator struct {
 	writer       writer
 }
 
-func (g *fileGenerator) do() error {
+// Do generates a file given a template. Then, it uses writer to render output.
+func (g *fileGenerator) Do() error {
 	buf, err := g.renderFromTemplate()
 	if err != nil {
 		return err

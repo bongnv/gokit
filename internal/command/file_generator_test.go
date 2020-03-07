@@ -29,7 +29,7 @@ func Test_fileGenerator(t *testing.T) {
 		writer: mockWriter,
 	}
 
-	err := generator.do()
+	err := generator.Do()
 	require.NoError(t, err)
 	require.Equal(t,
 		`main.go:
