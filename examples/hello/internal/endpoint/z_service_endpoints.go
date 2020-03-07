@@ -7,23 +7,23 @@ import (
 	"github.com/go-kit/kit/endpoint"
 )
 
-// Endpoints ...
-type Endpoints struct {
+// ServiceEndpoints ...
+type ServiceEndpoints struct {
 	HelloEndpoint endpoint.Endpoint
 	ByeEndpoint   endpoint.Endpoint
 }
 
-// MakeServerEndpoints returns an Endpoints struct where each endpoint invokes
+// MakeServiceEndpoints returns an Endpoints struct where each endpoint invokes
 // the corresponding method on the provided service.
-func MakeServerEndpoints(s hello.Service) Endpoints {
-	return Endpoints{
-		HelloEndpoint: makeHelloEndpoint(s),
-		ByeEndpoint:   makeByeEndpoint(s),
+func MakeServiceEndpoints(s hello.Service) ServiceEndpoints {
+	return ServiceEndpoints{
+		HelloEndpoint: makeServiceHelloEndpoint(s),
+		ByeEndpoint:   makeServiceByeEndpoint(s),
 	}
 }
 
 // makeHelloEndpoint returns an endpoint via the passed service.
-func makeHelloEndpoint(s hello.Service) endpoint.Endpoint {
+func makeServiceHelloEndpoint(s hello.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(*hello.Request)
 		resp, e := s.Hello(ctx, req)
@@ -32,7 +32,7 @@ func makeHelloEndpoint(s hello.Service) endpoint.Endpoint {
 }
 
 // makeByeEndpoint returns an endpoint via the passed service.
-func makeByeEndpoint(s hello.Service) endpoint.Endpoint {
+func makeServiceByeEndpoint(s hello.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(*hello.ByeRequest)
 		resp, e := s.Bye(ctx, req)
