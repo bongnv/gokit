@@ -8,10 +8,6 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-const (
-	interfaceName = "Service"
-)
-
 // Field presents a field in Golang. It includes name & type.
 type Field struct {
 	Name string
