@@ -20,8 +20,8 @@ jobs:
 
     - name: CI
       run: |
-      export PATH=$PATH:$(go env GOPATH)/bin
-      make ci
+        export PATH=$PATH:$(go env GOPATH)/bin
+        make ci
 
   build:
     name: Build
@@ -42,5 +42,5 @@ jobs:
 
     - name: Build
       run: |
-      export PATH=$PATH:$(go env GOPATH)/bin
-      make build
+        export PATH=$PATH:$(go env GOPATH)/bin
+        make build
