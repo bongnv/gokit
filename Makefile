@@ -19,6 +19,7 @@ build:
 
 install-tools:
 	@echo ">  Installing tools..."
+	export PATH=$PATH:$(go env GOPATH)/bin
 	go get -u golang.org/x/lint/golint
 
 ci: install-tools lint test-coverage
