@@ -8,6 +8,7 @@ import (
 	"go/ast"
 	"path"
 
+	"github.com/bongnv/gokit/internal/task"
 	"github.com/google/subcommands"
 	"golang.org/x/tools/go/packages"
 )
@@ -40,7 +41,7 @@ func (c *genCmd) SetFlags(f *flag.FlagSet) {
 }
 
 func (c *genCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
-	if err := c.do(); err != nil {
+	if err := c.Do(); err != nil {
 		fmt.Println("Executed with err:", err)
 		return subcommands.ExitFailure
 	}
@@ -48,14 +49,14 @@ func (c *genCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) s
 	return subcommands.ExitSuccess
 }
 
-func (c *genCmd) do() error {
+func (c *genCmd) Do() error {
 	s, err := c.parseSource()
 	if err != nil {
 		return err
 	}
 
 	writer := &fileWriter{}
-	tasks := taskGroup{
+	tasks := task.Group{
 		&fileGenerator{
 			filePath:     path.Join(c.path, endpointsFileName),
 			templateName: endpointsTemplateName,
@@ -70,7 +71,7 @@ func (c *genCmd) do() error {
 		},
 	}
 
-	return tasks.do()
+	return tasks.Do()
 }
 
 func (c *genCmd) parseSource() (*Service, error) {

@@ -1,4 +1,4 @@
-package command
+package task
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 
 type taskFunc func() error
 
-func (t taskFunc) do() error {
+func (t taskFunc) Do() error {
 	return t()
 }
 
@@ -24,14 +24,14 @@ func Test_taskGroup(t *testing.T) {
 		return errors.New("random error")
 	}
 
-	tasks := taskGroup{
+	tasks := Group{
 		taskFunc(mockTask),
 		taskFunc(mockTask),
 		taskFunc(mockTaskErr),
 		taskFunc(mockTask),
 	}
 
-	err := tasks.do()
+	err := tasks.Do()
 	require.Error(t, err)
 	require.Equal(t, 2, val)
 }

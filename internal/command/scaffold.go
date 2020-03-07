@@ -2,10 +2,12 @@ package command
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"path"
 
+	"github.com/bongnv/gokit/internal/task"
 	"github.com/google/subcommands"
 )
 
@@ -36,26 +38,39 @@ func (*scaffoldCmd) Usage() string {
 
 func (c *scaffoldCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&c.dir, "directory", ".", "Director to scaffold")
-	f.StringVar(&c.pkg, "pkg", "github.com/hello", "Package name")
+	f.StringVar(&c.pkg, "package", "", "project package")
 }
 
 func (c *scaffoldCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
-	if err := c.do(); err != nil {
-		fmt.Println("Executed with err:", err)
+	if err := c.Do(); err != nil {
+		fmt.Println(err)
+		f.Usage()
 		return subcommands.ExitFailure
 	}
 
 	return subcommands.ExitSuccess
 }
 
-func (c *scaffoldCmd) do() error {
+func (c *scaffoldCmd) validate() error {
+	if c.pkg == "" {
+		return errors.New("project package shouldn't be empty")
+	}
+
+	return nil
+}
+
+func (c *scaffoldCmd) Do() error {
+	if err := c.validate(); err != nil {
+		return err
+	}
+
 	writer := &fileWriter{}
 	serviceInfo := &Service{
 		PackageName: path.Base(c.pkg),
 		Package:     c.pkg,
 	}
 
-	tasks := taskGroup{
+	tasks := task.Group{
 		&fileGenerator{
 			filePath:     path.Join(c.dir, serviceFileName),
 			templateName: serviceTemplateName,
@@ -79,5 +94,5 @@ func (c *scaffoldCmd) do() error {
 		},
 	}
 
-	return tasks.do()
+	return tasks.Do()
 }
