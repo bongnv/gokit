@@ -6,23 +6,17 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/bongnv/gokit/util/httpserver"
 	"github.com/go-kit/kit/endpoint"
-	httptransport "github.com/go-kit/kit/transport/http"
 )
 
 type helperServer struct {
-	httpServer    HTTPServer
-	httpEndpoints []httpserver.Endpoint
-	httpOptions   []httptransport.ServerOption
-	middlewares   []endpoint.Middleware
+	httpServer  *httpServer
+	middlewares []endpoint.Middleware
 }
 
-func getDefaultNanny() *helperServer {
+func getDefaultHelper() *helperServer {
 	return &helperServer{
-		httpServer:    httpserver.New(),
-		httpEndpoints: nil,
-		httpOptions:   nil,
+		httpServer: &httpServer{},
 	}
 }
 
@@ -36,9 +30,6 @@ func (n *helperServer) getServers() []server {
 }
 
 func (n *helperServer) initServers() error {
-	n.httpServer.WithEndpoint(n.httpEndpoints...)
-	n.httpServer.WithOption(n.httpOptions...)
-
 	for _, s := range n.getServers() {
 		if err := s.Init(); err != nil {
 			return err
@@ -80,20 +71,9 @@ func (n *helperServer) waitForStopSignal() {
 }
 
 func (n *helperServer) stopServers() {
-	var wg sync.WaitGroup
-
 	for _, s := range n.getServers() {
-		wg.Add(1)
-		serviceClone := s
-		go func() {
-			defer wg.Done()
-			if err := serviceClone.Stop(); err != nil {
-				// TODO: log errors
-			}
-		}()
+		_ = s.Stop()
 	}
-
-	wg.Wait()
 }
 
 func (n *helperServer) run() error {

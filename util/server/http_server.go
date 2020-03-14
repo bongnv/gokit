@@ -1,4 +1,4 @@
-package httpserver
+package server
 
 import (
 	"context"
@@ -20,23 +20,17 @@ type Endpoint struct {
 	ResponseEncoder httptransport.EncodeResponseFunc
 }
 
-// Server ...
-type Server struct {
+type httpServer struct {
 	endpoints []Endpoint
+	options   []httptransport.ServerOption
 
 	httpAddress  string
 	httpHandler  http.Handler
 	httpListener net.Listener
-	options      []httptransport.ServerOption
-}
-
-// New ...
-func New() *Server {
-	return &Server{}
 }
 
 // Init ...
-func (s *Server) Init() error {
+func (s *httpServer) Init() error {
 	s.initializeHandler()
 
 	httpListener, err := net.Listen("tcp", s.httpAddress)
@@ -48,7 +42,7 @@ func (s *Server) Init() error {
 	return nil
 }
 
-func (s *Server) initializeHandler() {
+func (s *httpServer) initializeHandler() {
 	r := mux.NewRouter()
 
 	for _, e := range s.endpoints {
@@ -74,22 +68,22 @@ func (s *Server) initializeHandler() {
 }
 
 // Serve ...
-func (s *Server) Serve() error {
+func (s *httpServer) Serve() error {
 	return http.Serve(s.httpListener, s.httpHandler)
 }
 
 // Stop ...
-func (s *Server) Stop() error {
+func (s *httpServer) Stop() error {
 	return s.httpListener.Close()
 }
 
 // WithEndpoint ...
-func (s *Server) WithEndpoint(endpoints ...Endpoint) {
+func (s *httpServer) WithEndpoint(endpoints ...Endpoint) {
 	s.endpoints = append(s.endpoints, endpoints...)
 }
 
 // WithOption ...
-func (s *Server) WithOption(opts ...httptransport.ServerOption) {
+func (s *httpServer) WithOption(opts ...httptransport.ServerOption) {
 	s.options = append(s.options, opts...)
 }
 

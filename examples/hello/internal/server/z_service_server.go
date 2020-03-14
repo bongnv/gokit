@@ -7,7 +7,6 @@ import (
 
 	"github.com/bongnv/gokit/examples/hello"
 	"github.com/bongnv/gokit/examples/hello/internal/endpoint"
-	"github.com/bongnv/gokit/util/httpserver"
 	"github.com/bongnv/gokit/util/server"
 )
 
@@ -26,13 +25,13 @@ func getServiceHTTPOptions(serverEndpoints endpoint.ServiceEndpoints) []server.O
 	opts := []server.Option{}
 
 	opts = append(opts,
-		server.WithHTTPEndpoint(httpserver.Endpoint{
+		server.WithHTTPEndpoint(server.Endpoint{
 			Method:         "",
 			Path:           "/hello",
 			Endpoint:       serverEndpoints.HelloEndpoint,
 			RequestDecoder: decodeServiceHelloRequest,
 		}),
-		server.WithHTTPEndpoint(httpserver.Endpoint{
+		server.WithHTTPEndpoint(server.Endpoint{
 			Method:         "",
 			Path:           "/bye",
 			Endpoint:       serverEndpoints.ByeEndpoint,
