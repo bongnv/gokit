@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/bongnv/gokit/util/httpserver"
 	"github.com/bongnv/gokit/util/server"
 	"{{ .Package }}"
 	"{{ .Package }}/internal/endpoint"
@@ -31,7 +30,7 @@ func get{{ .Name }}HTTPOptions(serverEndpoints endpoint.{{ .Name }}Endpoints) []
 
 	opts = append(opts,
     {{range $endpoint := .Endpoints -}}
-        server.WithHTTPEndpoint(httpserver.Endpoint{
+        server.WithHTTPEndpoint(server.Endpoint{
             Method:         "{{ $endpoint.Method }}",
             Path:           "{{ $endpoint.HTTPPath }}",
             Endpoint:       serverEndpoints.{{ $endpoint.Name }}Endpoint,
