@@ -34,7 +34,11 @@ func getHTTPOptions(serverEndpoints endpoints) []server.Option {
             Method:         "{{ $endpoint.Method }}",
             Path:           "{{ $endpoint.HTTPPath }}",
             Endpoint:       serverEndpoints.{{ $endpoint.Name }}Endpoint,
-            RequestDecoder: decode{{ $serviceName }}{{ $endpoint.Name}}Request,
+		{{- if eq (len $endpoint.Params) 1}}
+			RequestDecoder: nil,
+		{{ else }}
+        	RequestDecoder: decode{{ $endpoint.Name}}Request,
+		{{ end -}}
         }),
     {{ end -}}
 	)
@@ -43,7 +47,8 @@ func getHTTPOptions(serverEndpoints endpoints) []server.Option {
 }
 
 {{ range $endpoint := .Endpoints }}
-func decode{{ $serviceName }}{{ $endpoint.Name}}Request(_ context.Context, r *http.Request) (request interface{}, err error) {
+{{ if ge (len $endpoint.Params) 2}}
+func decode{{ $endpoint.Name}}Request(_ context.Context, r *http.Request) (request interface{}, err error) {
 	{{- $requestType := (index $endpoint.Params 1).Type }}
 	var req {{ $requestType }}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -52,4 +57,5 @@ func decode{{ $serviceName }}{{ $endpoint.Name}}Request(_ context.Context, r *ht
 
 	return req, err
 }
+{{ end }}
 {{end}}

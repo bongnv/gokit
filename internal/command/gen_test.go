@@ -30,7 +30,7 @@ func Test_genCmd_Execute(t *testing.T) {
 		interfaceName: "Service",
 	}
 
-	mockParser.On("Parse").Return(&parser.Service{
+	mockParser.On("Parse", ".", "Service").Return(&parser.Service{
 		Name:        "Service",
 		Package:     "github.com/hello",
 		PackageName: "hello",

@@ -19,25 +19,29 @@ type endpoints struct {
 // the corresponding method on the provided service.
 func makeEndpoints(s hello.Service) endpoints {
 	return endpoints{
-		HelloEndpoint: makeServiceHelloEndpoint(s),
-		ByeEndpoint:   makeServiceByeEndpoint(s),
+		HelloEndpoint: makeHelloEndpoint(s),
+		ByeEndpoint:   makeByeEndpoint(s),
 	}
 }
 
-// makeHelloEndpoint returns an endpoint via the passed service.
-func makeServiceHelloEndpoint(s hello.Service) endpoint.Endpoint {
+// makeEndpoint returns an endpoint via the passed service.
+func makeHelloEndpoint(s hello.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
+
 		req := request.(*hello.Request)
 		resp, e := s.Hello(ctx, req)
 		return resp, e
+
 	}
 }
 
-// makeByeEndpoint returns an endpoint via the passed service.
-func makeServiceByeEndpoint(s hello.Service) endpoint.Endpoint {
+// makeEndpoint returns an endpoint via the passed service.
+func makeByeEndpoint(s hello.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
+
 		req := request.(*hello.ByeRequest)
 		resp, e := s.Bye(ctx, req)
 		return resp, e
+
 	}
 }

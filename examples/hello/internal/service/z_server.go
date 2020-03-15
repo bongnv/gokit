@@ -30,20 +30,20 @@ func getHTTPOptions(serverEndpoints endpoints) []server.Option {
 			Method:         "",
 			Path:           "/hello",
 			Endpoint:       serverEndpoints.HelloEndpoint,
-			RequestDecoder: decodeServiceHelloRequest,
+			RequestDecoder: decodeHelloRequest,
 		}),
 		server.WithHTTPEndpoint(server.Endpoint{
 			Method:         "",
 			Path:           "/bye",
 			Endpoint:       serverEndpoints.ByeEndpoint,
-			RequestDecoder: decodeServiceByeRequest,
+			RequestDecoder: decodeByeRequest,
 		}),
 	)
 
 	return opts
 }
 
-func decodeServiceHelloRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+func decodeHelloRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
 	var req *hello.Request
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func decodeServiceHelloRequest(_ context.Context, r *http.Request) (request inte
 	return req, err
 }
 
-func decodeServiceByeRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
+func decodeByeRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
 	var req *hello.ByeRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, err

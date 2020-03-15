@@ -48,14 +48,14 @@ type Service struct {
 // Parser is an interface to wrap Parse method.
 //go:generate mockery -name=Parser -inpkg -case=underscore
 type Parser interface {
-	Parse() (*Service, error)
+	Parse(path, serviceName string) (*Service, error)
 }
 
 // DefaultParser is an implementation of parser.
-type DefaultParser struct {
-	Path        string
-	ServiceName string
+type DefaultParser struct{}
 
+type serviceParser struct {
+	serviceName string
 	pkg         *packages.Package
 	f           *ast.File
 	serviceType *ast.InterfaceType
@@ -63,13 +63,13 @@ type DefaultParser struct {
 }
 
 // Parse parses codes to return a service.
-func (p *DefaultParser) Parse() (*Service, error) {
-	pkgs, err := parsePackages(p.Path)
+func (p *DefaultParser) Parse(path, serviceName string) (*Service, error) {
+	pkgs, err := parsePackages(path)
 	if err != nil {
 		return nil, err
 	}
 
-	return p.parseServiceData(pkgs)
+	return p.parseServiceData(pkgs, serviceName)
 }
 
 func parsePackages(path string) ([]*packages.Package, error) {
@@ -90,7 +90,7 @@ func parsePackages(path string) ([]*packages.Package, error) {
 	)
 }
 
-func (p *DefaultParser) parseServiceData(pkgs []*packages.Package) (*Service, error) {
+func (p *DefaultParser) parseServiceData(pkgs []*packages.Package, serviceName string) (*Service, error) {
 	for _, pkg := range pkgs {
 		for _, f := range pkg.Syntax {
 			for _, decl := range f.Decls {
@@ -106,17 +106,20 @@ func (p *DefaultParser) parseServiceData(pkgs []*packages.Package) (*Service, er
 							continue
 						}
 
-						if spec.Name.Name != p.ServiceName {
+						if spec.Name.Name != serviceName {
 							continue
 						}
 
-						p.pkg = pkg
-						p.packageName = f.Name.Name
-						p.f = f
-						p.serviceType = sType
+						p := &serviceParser{
+							serviceName: serviceName,
+							pkg:         pkg,
+							packageName: f.Name.Name,
+							serviceType: sType,
+							f:           f,
+						}
 
 						s := &Service{
-							Name:        p.ServiceName,
+							Name:        serviceName,
 							Package:     p.pkg.PkgPath,
 							PackageName: p.packageName,
 							Endpoints:   p.parseEndpoints(),
@@ -133,7 +136,7 @@ func (p *DefaultParser) parseServiceData(pkgs []*packages.Package) (*Service, er
 	return nil, errors.New("serviceParser: no service found")
 }
 
-func (p *DefaultParser) parseEndpoints() []Endpoint {
+func (p *serviceParser) parseEndpoints() []Endpoint {
 	var methods []Endpoint
 	for _, method := range p.serviceType.Methods.List {
 		fnType, ok := method.Type.(*ast.FuncType)
@@ -161,7 +164,7 @@ func (p *DefaultParser) parseEndpoints() []Endpoint {
 	return methods
 }
 
-func (p *DefaultParser) getTypeString(expr ast.Expr) string {
+func (p *serviceParser) getTypeString(expr ast.Expr) string {
 	var result string
 
 	switch etype := expr.(type) {
@@ -185,7 +188,7 @@ func (p *DefaultParser) getTypeString(expr ast.Expr) string {
 	return result
 }
 
-func (p *DefaultParser) extractFieldsFromAst(items []*ast.Field) []Field {
+func (p *serviceParser) extractFieldsFromAst(items []*ast.Field) []Field {
 	var output []Field
 
 	for _, item := range items {
