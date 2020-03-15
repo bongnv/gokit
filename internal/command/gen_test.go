@@ -16,8 +16,8 @@ func Test_getFilePath(t *testing.T) {
 		interfaceName: "Service",
 	}
 
-	filePath := c.getFilePath("endpoint", "endpoints")
-	require.Equal(t, "root/internal/endpoint/z_service_endpoints.go", filePath)
+	filePath := c.getFilePath("endpoints")
+	require.Equal(t, "root/internal/service/z_endpoints.go", filePath)
 }
 
 func Test_genCmd_Execute(t *testing.T) {
@@ -35,8 +35,8 @@ func Test_genCmd_Execute(t *testing.T) {
 		Package:     "github.com/hello",
 		PackageName: "hello",
 	}, nil).Once()
-	mockWriter.On("Write", "internal/endpoint/z_service_endpoints.go", mock.Anything).Return(nil).Once()
-	mockWriter.On("Write", "internal/server/z_service_server.go", mock.Anything).Return(nil).Once()
+	mockWriter.On("Write", "internal/service/z_endpoints.go", mock.Anything).Return(nil).Once()
+	mockWriter.On("Write", "internal/service/z_server.go", mock.Anything).Return(nil).Once()
 
 	resp := cmd.Execute(nil, nil)
 	require.Equal(t, subcommands.ExitSuccess, resp)

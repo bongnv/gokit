@@ -4,13 +4,13 @@ import (
 	"log"
 
 	"{{ .Package }}/internal/handlers"
-	"{{ .Package }}/internal/server"
+	"{{ .Package }}/internal/service"
 	gokitServer "github.com/bongnv/gokit/util/server"
 )
 
 func main() {
 	opts := []gokitServer.Option{}
-	opts = append(opts, server.GetServiceOptions(handlers.New())...)
+	opts = append(opts, service.GetOptions(handlers.New())...)
 
 	err := gokitServer.Serve(
 		opts...,

@@ -39,6 +39,10 @@ func isNumber(typeName string) bool {
 		typeName == "float32"
 }
 
+func toLower(input string) string {
+	return strings.ToLower(input)
+}
+
 func replace(input, from, to string) string {
 	return strings.Replace(input, from, to, -1)
 }
@@ -54,5 +58,6 @@ func getFuncMap() template.FuncMap {
 		"isNumber":   isNumber,
 		"replace":    replace,
 		"concat":     concat,
+		"toLower":    toLower,
 	}
 }

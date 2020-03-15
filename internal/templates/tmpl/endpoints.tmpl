@@ -2,7 +2,7 @@
 {{- $serviceInterface := printf "%s.%s" .PackageName .Name -}}
 {{- $serviceName := .Name }}
 
-package endpoint
+package {{ toLower $serviceName }}
 
 import (
 	"context"
@@ -11,17 +11,17 @@ import (
 	"{{ .Package }}"
 )
 
-// {{ .Name }}Endpoints ...
-type {{ .Name }}Endpoints struct {
+// endpoints ...
+type endpoints struct {
 {{ range $endpoint := .Endpoints }}
 	{{- $endpoint.Name }}Endpoint endpoint.Endpoint
 {{ end -}}
 }
 
-// Make{{ .Name }}Endpoints returns an Endpoints struct where each endpoint invokes
+// makeEndpoints returns an Endpoints struct where each endpoint invokes
 // the corresponding method on the provided service.
-func Make{{ .Name }}Endpoints(s {{ $serviceInterface }}) {{ .Name }}Endpoints {
-	return {{ .Name }}Endpoints{
+func makeEndpoints(s {{ $serviceInterface }}) endpoints {
+	return endpoints{
 	{{ range $endpoint := .Endpoints }}
 		{{- $endpoint.Name }}Endpoint: make{{ $serviceName }}{{ $endpoint.Name }}Endpoint(s),
 	{{ end -}}
