@@ -35,7 +35,7 @@ type Person struct {
 	srcAST := getASTFromSrc(src)
 	decl := srcAST.Decls[1].(*ast.GenDecl)
 	spec := decl.Specs[0].(*ast.TypeSpec)
-	p := &DefaultParser{
+	p := &serviceParser{
 		serviceType: spec.Type.(*ast.InterfaceType),
 		f:           srcAST,
 		packageName: srcAST.Name.Name,

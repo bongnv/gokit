@@ -1,0 +1,13 @@
+package {{ .PackageName }}
+
+import "context"
+
+// {{ .Name }}Service is a CRUD interface for a {{ .Name }} service.
+type {{ .Name }}Service interface {
+	Get(ctx context.Context, id string) (*{{ .Name }}, error)
+	List(ctx context.Context) ([]*{{ .Name }}, error)
+    Create(ctx context.Context, req *{{ .Name }}) (*{{ .Name }}, error)
+    Update(ctx context.Context, req *{{ .Name }}) (*{{ .Name }}, error)
+    Delete(ctx context.Context, req *{{ .Name }}) error
+}
+

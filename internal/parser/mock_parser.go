@@ -9,13 +9,13 @@ type MockParser struct {
 	mock.Mock
 }
 
-// Parse provides a mock function with given fields:
-func (_m *MockParser) Parse() (*Service, error) {
-	ret := _m.Called()
+// Parse provides a mock function with given fields: path, serviceName
+func (_m *MockParser) Parse(path string, serviceName string) (*Service, error) {
+	ret := _m.Called(path, serviceName)
 
 	var r0 *Service
-	if rf, ok := ret.Get(0).(func() *Service); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(string, string) *Service); ok {
+		r0 = rf(path, serviceName)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*Service)
@@ -23,8 +23,8 @@ func (_m *MockParser) Parse() (*Service, error) {
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func() error); ok {
-		r1 = rf()
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(path, serviceName)
 	} else {
 		r1 = ret.Error(1)
 	}

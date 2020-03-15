@@ -26,8 +26,9 @@ var (
 )
 
 type scaffoldCmd struct {
-	dir string
-	pkg string
+	dir    string
+	pkg    string
+	writer writer.Writer
 }
 
 func (*scaffoldCmd) Name() string     { return "scaffold" }
@@ -66,7 +67,6 @@ func (c *scaffoldCmd) Do() error {
 		return err
 	}
 
-	fileWriter := &writer.FileWriter{}
 	serviceInfo := &parser.Service{
 		PackageName: path.Base(c.pkg),
 		Package:     c.pkg,
@@ -77,23 +77,25 @@ func (c *scaffoldCmd) Do() error {
 			filePath:     path.Join(c.dir, serviceFileName),
 			templateName: serviceTemplateName,
 			service:      serviceInfo,
-			writer:       fileWriter,
+			writer:       c.writer,
 		},
 		&genCmd{
 			path:          c.dir,
 			interfaceName: "Service",
+			parser:        &parser.DefaultParser{},
+			writer:        c.writer,
 		},
 		&fileGenerator{
 			filePath:     path.Join(c.dir, handlersFileName),
 			templateName: handlersTemplateName,
 			service:      serviceInfo,
-			writer:       fileWriter,
+			writer:       c.writer,
 		},
 		&fileGenerator{
 			filePath:     path.Join(c.dir, mainFileName),
 			templateName: mainTemplateName,
 			service:      serviceInfo,
-			writer:       fileWriter,
+			writer:       c.writer,
 		},
 	}
 

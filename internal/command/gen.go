@@ -53,18 +53,7 @@ func (c *genCmd) Execute(_ context.Context, _ *flag.FlagSet, _ ...interface{}) s
 }
 
 func (c *genCmd) Do() error {
-	if c.parser == nil {
-		c.parser = &parser.DefaultParser{
-			Path:        c.path,
-			ServiceName: c.interfaceName,
-		}
-	}
-
-	if c.writer == nil {
-		c.writer = &writer.FileWriter{}
-	}
-
-	s, err := c.parser.Parse()
+	s, err := c.parser.Parse(c.path, c.interfaceName)
 	if err != nil {
 		return err
 	}

@@ -23,19 +23,23 @@ type endpoints struct {
 func makeEndpoints(s {{ $serviceInterface }}) endpoints {
 	return endpoints{
 	{{ range $endpoint := .Endpoints }}
-		{{- $endpoint.Name }}Endpoint: make{{ $serviceName }}{{ $endpoint.Name }}Endpoint(s),
+		{{- $endpoint.Name }}Endpoint: make{{ $endpoint.Name }}Endpoint(s),
 	{{ end -}}
 	}
 }
 
 {{ range $endpoint := .Endpoints }}
-// make{{ $endpoint.Name }}Endpoint returns an endpoint via the passed service.
-func make{{ $serviceName }}{{ $endpoint.Name }}Endpoint(s {{ $serviceInterface }}) endpoint.Endpoint {
+// makeEndpoint returns an endpoint via the passed service.
+func make{{ $endpoint.Name }}Endpoint(s {{ $serviceInterface }}) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
+	{{ if eq (len $endpoint.Params) 1}}
+		return s.{{ $endpoint.Name }}(ctx)
+	{{ else }}
 	{{- $requestType := (index $endpoint.Params 1).Type }}
 		req := request.({{ $requestType }})
 		resp, e := s.{{ $endpoint.Name }}(ctx, req)
 		return resp, e
+	{{ end }}
 	}
 }
 {{end}}
