@@ -2,7 +2,7 @@
 {{- $serviceInterface := printf "%s.%s" .PackageName .Name -}}
 {{- $serviceName := .Name }}
 
-package server
+package {{ toLower $serviceName }}
 
 import (
 	"context"
@@ -14,18 +14,18 @@ import (
 	"{{ .Package }}/internal/endpoint"
 )
 
-// Get{{ .Name }}Options ...
-func Get{{ .Name }}Options(s {{ $serviceInterface  }}) []server.Option {
-	serverEndpoints := endpoint.Make{{ .Name }}Endpoints(s)
+// GetOptions ...
+func GetOptions(s {{ $serviceInterface  }}) []server.Option {
+	serverEndpoints := makeEndpoints(s)
 
 	opts := []server.Option{}
 
-	opts = append(opts,get{{ .Name }}HTTPOptions(serverEndpoints)...,)
+	opts = append(opts,getHTTPOptions(serverEndpoints)...,)
 
 	return opts
 }
 
-func get{{ .Name }}HTTPOptions(serverEndpoints endpoint.{{ .Name }}Endpoints) []server.Option {
+func getHTTPOptions(serverEndpoints endpoints) []server.Option {
 	opts := []server.Option{}
 
 	opts = append(opts,
