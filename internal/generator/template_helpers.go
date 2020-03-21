@@ -59,6 +59,10 @@ func concat(inputs ...string) string {
 	return strings.Join(inputs, "")
 }
 
+func toPlural(input string) string {
+	return input + "s"
+}
+
 func getFuncMap() template.FuncMap {
 	return template.FuncMap{
 		"emptyValue": emptyValue,
@@ -68,5 +72,6 @@ func getFuncMap() template.FuncMap {
 		"concat":     concat,
 		"toLower":    toLower,
 		"initValue":  initValue,
+		"toPlural":   toPlural,
 	}
 }

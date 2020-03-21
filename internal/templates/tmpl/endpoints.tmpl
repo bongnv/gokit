@@ -1,6 +1,6 @@
-{{- $packageName := .PackageName }}
+{{- $packageName := .PackageName -}}
 {{- $serviceInterface := printf "%s.%s" .PackageName .Name -}}
-{{- $serviceName := .Name }}
+{{- $serviceName := .Name -}}
 
 package {{ toLower $serviceName }}
 
@@ -32,14 +32,23 @@ func makeEndpoints(s {{ $serviceInterface }}) endpoints {
 // makeEndpoint returns an endpoint via the passed service.
 func make{{ $endpoint.Name }}Endpoint(s {{ $serviceInterface }}) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-	{{ if eq (len $endpoint.Params) 1}}
-		return s.{{ $endpoint.Name }}(ctx)
+		var (
+			resp interface{}
+			err error
+		)
+		{{ $leftSide := "resp, err" -}}
+		{{- if eq (len $endpoint.Results) 1 }}
+			{{- $leftSide = "err" -}}
+		{{ end }}
+
+	{{if eq (len $endpoint.Params) 1}}
+		{{ $leftSide }} = s.{{ $endpoint.Name }}(ctx)
 	{{ else }}
-	{{- $requestType := (index $endpoint.Params 1).Type }}
+		{{- $requestType := (index $endpoint.Params 1).Type }}
 		req := request.({{ $requestType }})
-		resp, e := s.{{ $endpoint.Name }}(ctx, req)
-		return resp, e
+		{{ $leftSide }} = s.{{ $endpoint.Name }}(ctx, req)
 	{{ end }}
+		return resp, err
 	}
 }
 {{end}}

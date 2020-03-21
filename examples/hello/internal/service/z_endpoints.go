@@ -27,21 +27,29 @@ func makeEndpoints(s hello.Service) endpoints {
 // makeEndpoint returns an endpoint via the passed service.
 func makeHelloEndpoint(s hello.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		var (
+			resp interface{}
+			err  error
+		)
 
 		req := request.(*hello.Request)
-		resp, e := s.Hello(ctx, req)
-		return resp, e
+		resp, err = s.Hello(ctx, req)
 
+		return resp, err
 	}
 }
 
 // makeEndpoint returns an endpoint via the passed service.
 func makeByeEndpoint(s hello.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		var (
+			resp interface{}
+			err  error
+		)
 
 		req := request.(*hello.ByeRequest)
-		resp, e := s.Bye(ctx, req)
-		return resp, e
+		resp, err = s.Bye(ctx, req)
 
+		return resp, err
 	}
 }

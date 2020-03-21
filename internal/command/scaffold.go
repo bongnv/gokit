@@ -68,7 +68,7 @@ func (c *scaffoldCmd) Do() error {
 		return err
 	}
 
-	serviceInfo := &parser.Service{
+	serviceInfo := &parser.Data{
 		PackageName: path.Base(c.pkg),
 		Package:     c.pkg,
 	}
@@ -77,7 +77,7 @@ func (c *scaffoldCmd) Do() error {
 		&generator.Generator{
 			FilePath:     path.Join(c.dir, serviceFileName),
 			TemplateName: serviceTemplateName,
-			Service:      serviceInfo,
+			Data:         serviceInfo,
 			Writer:       c.writer,
 		},
 		&genCmd{
@@ -89,13 +89,13 @@ func (c *scaffoldCmd) Do() error {
 		&generator.Generator{
 			FilePath:     path.Join(c.dir, handlersFileName),
 			TemplateName: handlersTemplateName,
-			Service:      serviceInfo,
+			Data:         serviceInfo,
 			Writer:       c.writer,
 		},
 		&generator.Generator{
 			FilePath:     path.Join(c.dir, mainFileName),
 			TemplateName: mainTemplateName,
-			Service:      serviceInfo,
+			Data:         serviceInfo,
 			Writer:       c.writer,
 		},
 	}
