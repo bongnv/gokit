@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/bongnv/gokit/internal/generator"
 	"github.com/bongnv/gokit/internal/parser"
 	"github.com/bongnv/gokit/internal/task"
 	"github.com/bongnv/gokit/internal/writer"
@@ -55,14 +56,14 @@ func (c *crudCmd) Do() error {
 
 	fileName := "z_" + strings.ToLower(c.resource) + ".go"
 	tasks := task.Group{
-		&fileGenerator{
-			filePath:     path.Join(c.path, fileName),
-			templateName: crudTemplateName,
-			service: &parser.Service{
+		&generator.Generator{
+			FilePath:     path.Join(c.path, fileName),
+			TemplateName: crudTemplateName,
+			Service: &parser.Service{
 				Name:        c.resource,
 				PackageName: path.Base(absPath),
 			},
-			writer: c.writer,
+			Writer: c.writer,
 		},
 		&genCmd{
 			path:          c.path,

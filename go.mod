@@ -6,6 +6,7 @@ require (
 	github.com/go-bindata/go-bindata v3.1.2+incompatible // indirect
 	github.com/go-kit/kit v0.9.0
 	github.com/go-logfmt/logfmt v0.5.0 // indirect
+	github.com/gogo/protobuf v1.3.1
 	github.com/google/subcommands v1.2.0
 	github.com/gorilla/mux v1.7.3
 	github.com/stretchr/testify v1.4.0

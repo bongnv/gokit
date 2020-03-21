@@ -5,6 +5,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/bongnv/gokit/examples/hello"
@@ -44,8 +45,8 @@ func getHTTPOptions(serverEndpoints endpoints) []server.Option {
 }
 
 func decodeHelloRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
-	var req *hello.Request
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	req := &hello.Request{}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil && err != io.EOF {
 		return nil, err
 	}
 
@@ -53,8 +54,8 @@ func decodeHelloRequest(_ context.Context, r *http.Request) (request interface{}
 }
 
 func decodeByeRequest(_ context.Context, r *http.Request) (request interface{}, err error) {
-	var req *hello.ByeRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	req := &hello.ByeRequest{}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil && err != io.EOF {
 		return nil, err
 	}
 

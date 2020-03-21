@@ -9,7 +9,9 @@ import (
 )
 
 func main() {
-	opts := []gokitServer.Option{}
+	opts := []gokitServer.Option{
+		gokitServer.WithHTTPAddress(":8080"),
+	}
 	opts = append(opts, service.GetOptions(handlers.New())...)
 
 	err := gokitServer.Serve(

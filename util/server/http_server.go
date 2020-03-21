@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/bongnv/gokit/util/log"
 	"github.com/go-kit/kit/endpoint"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
@@ -21,10 +22,10 @@ type Endpoint struct {
 }
 
 type httpServer struct {
-	endpoints []Endpoint
-	options   []httptransport.ServerOption
+	endpoints   []Endpoint
+	options     []httptransport.ServerOption
+	httpAddress string
 
-	httpAddress  string
 	httpHandler  http.Handler
 	httpListener net.Listener
 }
@@ -69,6 +70,7 @@ func (s *httpServer) initializeHandler() {
 
 // Serve ...
 func (s *httpServer) Serve() error {
+	log.Info("msg", "HTTP service is starting at "+s.httpListener.Addr().String())
 	return http.Serve(s.httpListener, s.httpHandler)
 }
 

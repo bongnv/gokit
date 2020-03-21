@@ -6,6 +6,7 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/bongnv/gokit/util/log"
 	"github.com/go-kit/kit/endpoint"
 )
 
@@ -32,6 +33,7 @@ func (n *helperServer) getServers() []server {
 func (n *helperServer) initServers() error {
 	for _, s := range n.getServers() {
 		if err := s.Init(); err != nil {
+			log.Error("message", "Error while initializing service", "error", err)
 			return err
 		}
 	}
@@ -47,7 +49,7 @@ func (n *helperServer) startServers() {
 		go func() {
 			defer wg.Done()
 			if err := serviceClone.Serve(); err != nil {
-				// TODO: log errors
+				log.Error("message", "Error while starting service", "error", err)
 			}
 		}()
 	}
@@ -72,7 +74,9 @@ func (n *helperServer) waitForStopSignal() {
 
 func (n *helperServer) stopServers() {
 	for _, s := range n.getServers() {
-		_ = s.Stop()
+		if err := s.Stop(); err != nil {
+			log.Error("message", "Error while stopping service", "error", err)
+		}
 	}
 }
 
