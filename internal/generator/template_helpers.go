@@ -1,4 +1,4 @@
-package command
+package generator
 
 import (
 	"strings"
@@ -16,6 +16,14 @@ func emptyValue(typeName string) string {
 
 	if typeName == "string" {
 		return `""`
+	}
+
+	return typeName + "{}"
+}
+
+func initValue(typeName string) string {
+	if isPointer(typeName) {
+		return "&" + initValue(strings.TrimPrefix(typeName, "*"))
 	}
 
 	return typeName + "{}"
@@ -59,5 +67,6 @@ func getFuncMap() template.FuncMap {
 		"replace":    replace,
 		"concat":     concat,
 		"toLower":    toLower,
+		"initValue":  initValue,
 	}
 }

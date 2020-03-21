@@ -7,6 +7,7 @@ package {{ toLower $serviceName }}
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/bongnv/gokit/util/server"
@@ -49,9 +50,9 @@ func getHTTPOptions(serverEndpoints endpoints) []server.Option {
 {{ range $endpoint := .Endpoints }}
 {{ if ge (len $endpoint.Params) 2}}
 func decode{{ $endpoint.Name}}Request(_ context.Context, r *http.Request) (request interface{}, err error) {
-	{{- $requestType := (index $endpoint.Params 1).Type }}
-	var req {{ $requestType }}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	{{- $requestType := (index $endpoint.Params 1).Type -}}
+	req := {{ initValue $requestType }}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil && err != io.EOF {
 		return nil, err
 	}
 

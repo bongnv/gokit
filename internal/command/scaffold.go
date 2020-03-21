@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/bongnv/gokit/internal/generator"
 	"github.com/bongnv/gokit/internal/parser"
 	"github.com/bongnv/gokit/internal/task"
 	"github.com/bongnv/gokit/internal/writer"
@@ -73,11 +74,11 @@ func (c *scaffoldCmd) Do() error {
 	}
 
 	tasks := task.Group{
-		&fileGenerator{
-			filePath:     path.Join(c.dir, serviceFileName),
-			templateName: serviceTemplateName,
-			service:      serviceInfo,
-			writer:       c.writer,
+		&generator.Generator{
+			FilePath:     path.Join(c.dir, serviceFileName),
+			TemplateName: serviceTemplateName,
+			Service:      serviceInfo,
+			Writer:       c.writer,
 		},
 		&genCmd{
 			path:          c.dir,
@@ -85,17 +86,17 @@ func (c *scaffoldCmd) Do() error {
 			parser:        &parser.DefaultParser{},
 			writer:        c.writer,
 		},
-		&fileGenerator{
-			filePath:     path.Join(c.dir, handlersFileName),
-			templateName: handlersTemplateName,
-			service:      serviceInfo,
-			writer:       c.writer,
+		&generator.Generator{
+			FilePath:     path.Join(c.dir, handlersFileName),
+			TemplateName: handlersTemplateName,
+			Service:      serviceInfo,
+			Writer:       c.writer,
 		},
-		&fileGenerator{
-			filePath:     path.Join(c.dir, mainFileName),
-			templateName: mainTemplateName,
-			service:      serviceInfo,
-			writer:       c.writer,
+		&generator.Generator{
+			FilePath:     path.Join(c.dir, mainFileName),
+			TemplateName: mainTemplateName,
+			Service:      serviceInfo,
+			Writer:       c.writer,
 		},
 	}
 
