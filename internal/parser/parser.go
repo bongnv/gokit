@@ -36,8 +36,8 @@ type Endpoint struct {
 	Tags     map[string]string
 }
 
-// Service includes details of a service.
-type Service struct {
+// Data includes details of a service.
+type Data struct {
 	Name        string
 	Endpoints   []Endpoint
 	Package     string
@@ -48,7 +48,7 @@ type Service struct {
 // Parser is an interface to wrap Parse method.
 //go:generate mockery -name=Parser -inpkg -case=underscore
 type Parser interface {
-	Parse(path, serviceName string) (*Service, error)
+	Parse(path, serviceName string) (*Data, error)
 }
 
 // DefaultParser is an implementation of parser.
@@ -63,7 +63,7 @@ type serviceParser struct {
 }
 
 // Parse parses codes to return a service.
-func (p *DefaultParser) Parse(path, serviceName string) (*Service, error) {
+func (p *DefaultParser) Parse(path, serviceName string) (*Data, error) {
 	pkgs, err := parsePackages(path)
 	if err != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func parsePackages(path string) ([]*packages.Package, error) {
 	)
 }
 
-func (p *DefaultParser) parseServiceData(pkgs []*packages.Package, serviceName string) (*Service, error) {
+func (p *DefaultParser) parseServiceData(pkgs []*packages.Package, serviceName string) (*Data, error) {
 	for _, pkg := range pkgs {
 		for _, f := range pkg.Syntax {
 			for _, decl := range f.Decls {
@@ -118,7 +118,7 @@ func (p *DefaultParser) parseServiceData(pkgs []*packages.Package, serviceName s
 							f:           f,
 						}
 
-						s := &Service{
+						s := &Data{
 							Name:        serviceName,
 							Package:     p.pkg.PkgPath,
 							PackageName: p.packageName,
@@ -146,7 +146,7 @@ func (p *serviceParser) parseEndpoints() []Endpoint {
 
 		params := p.extractFieldsFromAst(fnType.Params.List)
 		results := p.extractFieldsFromAst(fnType.Results.List)
-		tags := extractTagsFromComment(method.Comment.Text())
+		tags := extractTagsFromComment(method.Doc.Text())
 		httpPath := "/" + strings.ToLower(method.Names[0].Name)
 		if tags["path"] != "" {
 			httpPath = tags["path"]
@@ -155,6 +155,7 @@ func (p *serviceParser) parseEndpoints() []Endpoint {
 		methods = append(methods, Endpoint{
 			Name:     method.Names[0].Name,
 			HTTPPath: httpPath,
+			Method:   tags["method"],
 			Params:   params,
 			Results:  results,
 			Tags:     tags,
@@ -231,8 +232,8 @@ func extractTagsFromComment(comment string) map[string]string {
 		return nil
 	}
 
-	tagsInRaw := strings.TrimPrefix(comment, commentWithTagsPrefix)
-	return getTags(tagsInRaw)
+	comment = strings.TrimPrefix(comment, commentWithTagsPrefix)
+	return getTags(strings.TrimSpace(comment))
 }
 
 func getTags(tag string) map[string]string {

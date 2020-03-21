@@ -4,10 +4,65 @@ import "context"
 
 // {{ .Name }}Service is a CRUD interface for a {{ .Name }} service.
 type {{ .Name }}Service interface {
-	Get(ctx context.Context, id string) (*{{ .Name }}, error)
-	List(ctx context.Context) ([]*{{ .Name }}, error)
-    Create(ctx context.Context, req *{{ .Name }}) (*{{ .Name }}, error)
-    Update(ctx context.Context, req *{{ .Name }}) (*{{ .Name }}, error)
-    Delete(ctx context.Context, req *{{ .Name }}) error
+    //gokit: method:"GET" path:"/{{ .Name | toLower | toPlural }}/{ID}"
+	Get(ctx context.Context, req *Get{{ .Name }}Request) (*Get{{ .Name }}Response, error)
+
+    //gokit: method:"GET" path:"/{{ .Name | toLower | toPlural }}"
+	List(ctx context.Context, req *List{{ .Name }}Request) (*List{{ .Name }}Response, error)
+
+    //gokit: method:"POST" path:"/{{ .Name | toLower | toPlural }}"
+    Create(ctx context.Context, req *Create{{ .Name }}Request) (*Create{{ .Name }}Response, error)
+
+    //gokit: method:"PUT" path:"/{{ .Name | toLower | toPlural }}/{ID}"
+    Update(ctx context.Context, req *Update{{ .Name }}Request) (*Update{{ .Name }}Response, error)
+
+    //gokit: method:"DELETE" path:"/{{ .Name | toLower | toPlural }}/{ID}"
+    Delete(ctx context.Context, req *Delete{{ .Name }}Request) error
+}
+
+// Get{{ .Name }}Request ...
+type Get{{ .Name }}Request struct {
+    ID string `json:"id"`
+}
+
+// Get{{ .Name }}Response ...
+type Get{{ .Name }}Response struct {
+    {{ .Name }} {{ .Name }} `json:"{{ toLower .Name }}"`
+}
+
+// List{{ .Name }}Request ...
+type List{{ .Name }}Request struct {
+    Offset int64 `json:"offset"`
+    Limit  int64 `json:"limit"`
+}
+
+// List{{ .Name }}Response ...
+type List{{ .Name }}Response struct {
+    {{ toPlural .Name }} []*{{ .Name }} `json:"{{ .Name | toLower | toPlural }}"`
+}
+
+// Create{{ .Name }}Request ...
+type Create{{ .Name }}Request struct {
+    {{ .Name }} {{ .Name }} `json:"{{ toLower .Name }}"`
+}
+
+// Create{{ .Name }}Response ...
+type Create{{ .Name }}Response struct {
+    {{ .Name }} {{ .Name }} `json:"{{ toLower .Name }}"`
+}
+
+// Update{{ .Name }}Request ...
+type Update{{ .Name }}Request struct {
+    {{ .Name }} {{ .Name }} `json:"{{ toLower .Name }}"`
+}
+
+// Update{{ .Name }}Response ...
+type Update{{ .Name }}Response struct {
+    {{ .Name }} {{ .Name }} `json:"{{ toLower .Name }}"`
+}
+
+// Delete{{ .Name }}Request ...
+type Delete{{ .Name }}Request struct {
+    ID string `json:"id"`
 }
 

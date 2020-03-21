@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/bongnv/gokit/internal/generator"
@@ -20,10 +19,11 @@ const (
 )
 
 type crudCmd struct {
-	path     string
-	resource string
-	parser   parser.Parser
-	writer   writer.Writer
+	path          string
+	resource      string
+	serviceParser parser.Parser
+	crudParser    parser.Parser
+	writer        writer.Writer
 }
 
 func (*crudCmd) Name() string     { return "crud" }
@@ -49,9 +49,9 @@ func (c *crudCmd) Execute(_ context.Context, _ *flag.FlagSet, _ ...interface{}) 
 }
 
 func (c *crudCmd) Do() error {
-	absPath, err := filepath.Abs(c.path)
+	d, err := c.crudParser.Parse(c.path, c.resource)
 	if err != nil {
-		return err
+		return nil
 	}
 
 	fileName := "z_" + strings.ToLower(c.resource) + ".go"
@@ -59,16 +59,13 @@ func (c *crudCmd) Do() error {
 		&generator.Generator{
 			FilePath:     path.Join(c.path, fileName),
 			TemplateName: crudTemplateName,
-			Service: &parser.Service{
-				Name:        c.resource,
-				PackageName: path.Base(absPath),
-			},
-			Writer: c.writer,
+			Data:         d,
+			Writer:       c.writer,
 		},
 		&genCmd{
 			path:          c.path,
 			interfaceName: c.resource + "Service",
-			parser:        c.parser,
+			parser:        c.serviceParser,
 			writer:        c.writer,
 		},
 	}

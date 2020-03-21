@@ -11,16 +11,23 @@ import (
 
 func Test_crudCmd(t *testing.T) {
 	mockParser := &parser.MockParser{}
+	mockCrudParser := &parser.MockParser{}
 	mockWriter := &writer.MockWriter{}
 	c := &crudCmd{
-		path:     ".",
-		resource: "Todo",
-		parser:   mockParser,
-		writer:   mockWriter,
+		path:          ".",
+		resource:      "Todo",
+		serviceParser: mockParser,
+		crudParser:    mockCrudParser,
+		writer:        mockWriter,
 	}
 
 	mockWriter.On("Write", "z_todo.go", mock.Anything).Once().Return(nil)
-	mockParser.On("Parse", ".", "TodoService").Once().Return(&parser.Service{
+	mockCrudParser.On("Parse", ".", "Todo").Once().Return(&parser.Data{
+		Name:        "Todo",
+		Package:     "github.com/todo",
+		PackageName: "todo",
+	}, nil)
+	mockParser.On("Parse", ".", "TodoService").Once().Return(&parser.Data{
 		Name:        "TodoService",
 		Package:     "github.com/todo",
 		PackageName: "todo",

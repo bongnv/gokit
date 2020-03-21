@@ -23,7 +23,7 @@ func Test_fileGenerator(t *testing.T) {
 	generator := &Generator{
 		FilePath:     "main.go",
 		TemplateName: "main",
-		Service: &parser.Service{
+		Data: &parser.Data{
 			Package:     "github.com/hello",
 			PackageName: "hello",
 		},

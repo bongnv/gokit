@@ -23,7 +23,8 @@ import "context"
 
 // Service is a simple interface for a service.
 type Service interface {
-	Hello(ctx context.Context, p Person) error //gokit: path:"/say-hello"
+	//gokit: path:"/say-hello"
+	Hello(ctx context.Context, p Person) error
 }
 
 // Person presents a single person.

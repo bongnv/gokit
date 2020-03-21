@@ -9,6 +9,7 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/google/subcommands v1.2.0
 	github.com/gorilla/mux v1.7.3
+	github.com/samuel/go-thrift v0.0.0-20191111193933-5165175b40af
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073 // indirect
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
