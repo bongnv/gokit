@@ -23,6 +23,14 @@ jobs:
         export PATH=$PATH:$(go env GOPATH)/bin
         make ci
 
+    - name: Upload coverage to Codecov  
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./coverage.txt
+        flags: unittests
+        name: codecov-umbrella
+
   build:
     name: Build
     runs-on: ubuntu-latest
