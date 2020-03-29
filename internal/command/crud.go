@@ -51,7 +51,7 @@ func (c *crudCmd) Execute(_ context.Context, _ *flag.FlagSet, _ ...interface{}) 
 func (c *crudCmd) Do() error {
 	d, err := c.crudParser.Parse(c.path, c.resource)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	fileName := "z_" + strings.ToLower(c.resource) + ".go"

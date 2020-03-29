@@ -14,17 +14,25 @@ func Execute(ctx context.Context) int {
 	subcommands.Register(subcommands.HelpCommand(), "")
 	subcommands.Register(subcommands.FlagsCommand(), "")
 	subcommands.Register(subcommands.CommandsCommand(), "")
+
 	subcommands.Register(&scaffoldCmd{
 		writer: &writer.FileWriter{},
 	}, "")
+
 	subcommands.Register(&genCmd{
 		parser: &parser.DefaultParser{},
 		writer: &writer.FileWriter{},
 	}, "")
+
 	subcommands.Register(&crudCmd{
 		serviceParser: &parser.DefaultParser{},
 		crudParser:    parser.CRUDParser{},
 		writer:        &writer.FileWriter{},
+	}, "")
+
+	subcommands.Register(&entityCmd{
+		writer:       &writer.FileWriter{},
+		entityParser: parser.EntityParser{},
 	}, "")
 
 	flag.Parse()
