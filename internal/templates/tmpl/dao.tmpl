@@ -1,0 +1,52 @@
+{{- $daoName := printf "%sDAO" .Name -}}
+{{- $daoImpl := printf "impl%s" $daoName -}}
+
+package {{ .PackageName }}
+
+import (
+    "context"
+
+	"github.com/bongnv/gokit/util/entity/option"
+    "github.com/bongnv/gokit/util/entity/query"
+    "github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql" // initialize mysql
+)
+
+type {{ $daoName }} interface {
+	Create(context.Context, *{{ .Name }}) error
+	Query(context.Context, ...query.Query) ([]*{{ .Name }}, error)
+    Update(context.Context, *{{ .Name }}) error
+    Delete(context.Context, *{{ .Name }}) error
+}
+
+// New{{ $daoName }} opens connections to DB via the given DSN. It returns an DAO to access the database.
+func New{{ $daoName }}(db *gorm.DB) {{ $daoName }} {
+	return &{{ $daoImpl }}{
+		db: db,
+	}
+}
+
+type {{ $daoImpl }} struct {
+	db *gorm.DB
+}
+
+func (i *{{ $daoImpl }}) Create(_ context.Context, entity *{{ .Name }}) error {
+	result := i.db.Create(entity)
+	return result.Error
+}
+
+func (i *{{ $daoImpl }}) Query(_ context.Context, queries ...query.Query) ([]*{{ .Name }}, error) {
+	var results []*{{ .Name }}
+	result := query.Transform(i.db, queries...).Find(&results)
+	return results, result.Error
+}
+
+func (i *{{ $daoImpl }}) Update(_ context.Context, entity *{{ .Name }}) error {
+	result := i.db.Save(entity)
+	return result.Error
+}
+
+func (i *{{ $daoImpl }}) Delete(_ context.Context, entity *{{ .Name }}) error {
+	result := i.db.Delete(entity)
+	return result.Error
+}
