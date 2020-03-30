@@ -21,7 +21,7 @@ func Test_crudCmd(t *testing.T) {
 		writer:        mockWriter,
 	}
 
-	mockWriter.On("Write", "z_todo.go", mock.Anything).Once().Return(nil)
+	mockWriter.On("Write", "todo_service.go", mock.Anything).Once().Return(nil)
 	mockCrudParser.On("Parse", ".", "Todo").Once().Return(&parser.Data{
 		Name:        "Todo",
 		Package:     "github.com/todo",

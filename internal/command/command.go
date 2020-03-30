@@ -19,7 +19,7 @@ func Execute(ctx context.Context) int {
 		writer: &writer.FileWriter{},
 	}, "")
 
-	subcommands.Register(&genCmd{
+	subcommands.Register(&serviceCmd{
 		parser: &parser.DefaultParser{},
 		writer: &writer.FileWriter{},
 	}, "")

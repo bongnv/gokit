@@ -24,27 +24,27 @@ var (
 	internalFolder = "internal"
 )
 
-type genCmd struct {
+type serviceCmd struct {
 	path          string
 	interfaceName string
 	parser        parser.Parser
 	writer        writer.Writer
 }
 
-func (*genCmd) Name() string     { return "gen" }
-func (*genCmd) Synopsis() string { return "Generate go-kit codes." }
-func (*genCmd) Usage() string {
+func (*serviceCmd) Name() string     { return "service" }
+func (*serviceCmd) Synopsis() string { return "Generate go-kit codes for a service." }
+func (*serviceCmd) Usage() string {
 	return `print [-directory rootDir]:
-  Generate go-kit codes.
+  Generate go-kit codes for a service.
 `
 }
 
-func (c *genCmd) SetFlags(f *flag.FlagSet) {
+func (c *serviceCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&c.path, "directory", ".", "root path of a go-kit project")
 	f.StringVar(&c.interfaceName, "interface", defaultInterfaceName, "service interface")
 }
 
-func (c *genCmd) Execute(_ context.Context, _ *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
+func (c *serviceCmd) Execute(_ context.Context, _ *flag.FlagSet, _ ...interface{}) subcommands.ExitStatus {
 	if err := c.Do(); err != nil {
 		fmt.Println("Executed with err:", err)
 		return subcommands.ExitFailure
@@ -53,7 +53,7 @@ func (c *genCmd) Execute(_ context.Context, _ *flag.FlagSet, _ ...interface{}) s
 	return subcommands.ExitSuccess
 }
 
-func (c *genCmd) Do() error {
+func (c *serviceCmd) Do() error {
 	s, err := c.parser.Parse(c.path, c.interfaceName)
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func (c *genCmd) Do() error {
 	return tasks.Do()
 }
 
-func (c *genCmd) getFilePath(templateName string) string {
+func (c *serviceCmd) getFilePath(templateName string) string {
 	fileName := "z_" + templateName + ".go"
 	return path.Join(c.path, internalFolder, strings.ToLower(c.interfaceName), fileName)
 }
