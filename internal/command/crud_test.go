@@ -34,6 +34,7 @@ func Test_crudCmd(t *testing.T) {
 	}, nil)
 	mockWriter.On("Write", "internal/todoservice/z_endpoints.go", mock.Anything).Once().Return(nil)
 	mockWriter.On("Write", "internal/todoservice/z_server.go", mock.Anything).Once().Return(nil)
+	mockWriter.On("Write", "internal/handlers/todo_handler.go", mock.Anything).Once().Return(nil)
 
 	err := c.Do()
 	require.NoError(t, err)
