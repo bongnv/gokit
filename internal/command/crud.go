@@ -27,10 +27,10 @@ type crudCmd struct {
 }
 
 func (*crudCmd) Name() string     { return "crud" }
-func (*crudCmd) Synopsis() string { return "Generate go-kit codes." }
+func (*crudCmd) Synopsis() string { return "Generate go-kit codes for a crud service." }
 func (*crudCmd) Usage() string {
 	return `print [-directory rootDir]:
-  Generate go-kit codes.
+  Generate go-kit codes for a crud service..
 `
 }
 
@@ -54,7 +54,7 @@ func (c *crudCmd) Do() error {
 		return err
 	}
 
-	fileName := "z_" + strings.ToLower(c.resource) + ".go"
+	fileName := strings.ToLower(c.resource) + "_service.go"
 	tasks := task.Group{
 		&generator.Generator{
 			FilePath:     path.Join(c.path, fileName),
@@ -62,7 +62,7 @@ func (c *crudCmd) Do() error {
 			Data:         d,
 			Writer:       c.writer,
 		},
-		&genCmd{
+		&serviceCmd{
 			path:          c.path,
 			interfaceName: c.resource + "Service",
 			parser:        c.serviceParser,

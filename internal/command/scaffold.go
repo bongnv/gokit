@@ -80,7 +80,7 @@ func (c *scaffoldCmd) Do() error {
 			Data:         serviceInfo,
 			Writer:       c.writer,
 		},
-		&genCmd{
+		&serviceCmd{
 			path:          c.dir,
 			interfaceName: "Service",
 			parser:        &parser.DefaultParser{},

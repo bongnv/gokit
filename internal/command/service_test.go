@@ -11,7 +11,7 @@ import (
 )
 
 func Test_getFilePath(t *testing.T) {
-	c := &genCmd{
+	c := &serviceCmd{
 		path:          "root",
 		interfaceName: "Service",
 	}
@@ -20,10 +20,10 @@ func Test_getFilePath(t *testing.T) {
 	require.Equal(t, "root/internal/service/z_endpoints.go", filePath)
 }
 
-func Test_genCmd_Execute(t *testing.T) {
+func Test_serviceCmd_Execute(t *testing.T) {
 	mockParser := &parser.MockParser{}
 	mockWriter := &writer.MockWriter{}
-	cmd := &genCmd{
+	cmd := &serviceCmd{
 		parser:        mockParser,
 		writer:        mockWriter,
 		path:          ".",
