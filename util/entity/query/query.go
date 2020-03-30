@@ -15,3 +15,24 @@ func Transform(db *gorm.DB, queries ...Query) *gorm.DB {
 
 	return db
 }
+
+// Equal implements equal query.
+func Equal(field string, value interface{}) Query {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where(field+" = ?", value)
+	}
+}
+
+// Limit implements limit query.
+func Limit(limit int64) Query {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Limit(limit)
+	}
+}
+
+// Offset implements offset query.
+func Offset(offset int64) Query {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Offset(offset)
+	}
+}

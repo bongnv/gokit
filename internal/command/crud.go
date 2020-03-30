@@ -15,7 +15,12 @@ import (
 )
 
 const (
-	crudTemplateName = "crud"
+	crudTemplateName        = "crud"
+	crudHandlerTemplateName = "crud_handler"
+)
+
+var (
+	handlersFolder = path.Join(internalFolder, "handlers")
 )
 
 type crudCmd struct {
@@ -54,10 +59,11 @@ func (c *crudCmd) Do() error {
 		return err
 	}
 
-	fileName := strings.ToLower(c.resource) + "_service.go"
+	crudFilePath := path.Join(c.path, strings.ToLower(c.resource)+"_service.go")
+	handlerFilePath := path.Join(c.path, handlersFolder, strings.ToLower(c.resource)+"_handler.go")
 	tasks := task.Group{
 		&generator.Generator{
-			FilePath:     path.Join(c.path, fileName),
+			FilePath:     crudFilePath,
 			TemplateName: crudTemplateName,
 			Data:         d,
 			Writer:       c.writer,
@@ -67,6 +73,12 @@ func (c *crudCmd) Do() error {
 			interfaceName: c.resource + "Service",
 			parser:        c.serviceParser,
 			writer:        c.writer,
+		},
+		&generator.Generator{
+			FilePath:     handlerFilePath,
+			TemplateName: crudHandlerTemplateName,
+			Data:         d,
+			Writer:       c.writer,
 		},
 	}
 

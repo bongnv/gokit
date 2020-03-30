@@ -1,0 +1,115 @@
+{{- $implName := printf "impl%sHandler" .Name -}}
+{{- $daoName := printf "%sDAO" .Name -}}
+
+package handlers
+
+import (
+	"context"
+	"errors"
+
+	"{{ .Package }}"
+	"{{ .Package }}/internal/storage"
+	"github.com/bongnv/gokit/util/entity/query"
+	"github.com/bongnv/gokit/util/log"
+)
+
+
+type {{ $implName }} struct {
+	{{ $daoName }} storage.{{ $daoName }}
+}
+
+func (i *{{ $implName }}) Get(ctx context.Context, req *{{ .PackageName }}.Get{{ .Name }}Request) (*{{ .PackageName }}.Get{{ .Name }}Response, error) {
+	entities, err := i.{{ $daoName }}.Query(ctx,
+		query.Equal("id", req.ID),
+		query.Limit(1),
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(entities) == 0 {
+		return nil, errors.New("handlers: resource not found")
+	}
+
+	return &expenses.Get{{ .Name }}Response{
+		{{ .Name }}: entityTo{{ .Name }}(entities[0]),
+	}, nil
+}
+
+func (i *{{ $implName }}) List(ctx context.Context, req *{{ .PackageName }}.List{{ .Name }}Request) (*{{ .PackageName }}.List{{ .Name }}Response, error) {
+	entities, err := i.{{ $daoName }}.Query(ctx,
+		query.Offset(req.Offset),
+		query.Limit(req.Limit),
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]*{{ .PackageName }}.{{ .Name }}, len(entities))
+	for i, entity := range entities {
+		items[i] = entityTo{{ .Name }}(entity)
+	}
+
+	return &{{ .PackageName }}.List{{ .Name }}Response{
+		{{ toPlural .Name }}: items,
+	}, nil
+}
+
+func (i *{{ $implName }}) Create(ctx context.Context, req *{{ .PackageName }}.Create{{ .Name }}Request) (*{{ .PackageName }}.Create{{ .Name }}Response, error) {
+	entity := entityFrom{{ .Name }}(req.{{ .Name }})
+	err := i.{{ $daoName }}.Create(ctx, entity)
+	if err != nil {
+		return nil, err
+	}
+
+	return &{{ .PackageName }}.Create{{ .Name }}Response{
+		{{ .Name }}: entityTo{{ .Name }}(entity),
+	}, nil
+}
+
+func (i *{{ $implName }}) Update(ctx context.Context, req *{{ .PackageName }}.Update{{ .Name }}Request) (*{{ .PackageName }}.Update{{ .Name }}Response, error) {
+	entity := entityFrom{{ .Name }}(req.{{ .Name }})
+	err := i.{{ $daoName }}.Update(ctx, entity)
+	if err != nil {
+		return nil, err
+	}
+
+	return &{{ .PackageName }}.Update{{ .Name }}Response{
+		{{ .Name }}: entityTo{{ .Name }}(entity),
+	}, nil
+}
+
+func (i *{{ $implName }}) Delete(ctx context.Context, req *{{ .PackageName }}.Delete{{ .Name }}Request) error {
+	entities, err := i.{{ $daoName }}.Query(ctx,
+		query.Equal("id", req.ID),
+		query.Limit(1),
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if len(entities) == 0 {
+		return nil
+	}
+
+	return i.{{ $daoName }}.Delete(ctx, entities[0])
+}
+
+func entityTo{{ .Name }}(entity *storage.{{ .Name }}) *{{ .PackageName }}.{{ .Name }} {
+	if entity == nil {
+		return nil
+	}
+
+	return &{{ .PackageName }}.{{ .Name }}{}
+}
+
+func entityFrom{{ .Name }}(item *{{ .PackageName }}.{{ .Name }}) *storage.{{ .Name }} {
+	if item == nil {
+		return nil
+	}
+
+	return &storage.{{ .Name }}{}
+}
