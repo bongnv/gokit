@@ -3,6 +3,7 @@ package {{ .PackageName }}
 import "context"
 
 // {{ .Name }}Service is a CRUD interface for a {{ .Name }} service.
+//go:generate gokit service -interface {{ .Name }}Service
 type {{ .Name }}Service interface {
     //gokit: method:"GET" path:"/{{ .Name | toLower | toPlural }}/{ID}"
 	Get(ctx context.Context, req *Get{{ .Name }}Request) (*Get{{ .Name }}Response, error)
@@ -27,7 +28,7 @@ type Get{{ .Name }}Request struct {
 
 // Get{{ .Name }}Response ...
 type Get{{ .Name }}Response struct {
-    {{ .Name }} {{ .Name }} `json:"{{ toLower .Name }}"`
+    {{ .Name }} *{{ .Name }} `json:"{{ toLower .Name }}"`
 }
 
 // List{{ .Name }}Request ...
@@ -43,22 +44,22 @@ type List{{ .Name }}Response struct {
 
 // Create{{ .Name }}Request ...
 type Create{{ .Name }}Request struct {
-    {{ .Name }} {{ .Name }} `json:"{{ toLower .Name }}"`
+    {{ .Name }} *{{ .Name }} `json:"{{ toLower .Name }}"`
 }
 
 // Create{{ .Name }}Response ...
 type Create{{ .Name }}Response struct {
-    {{ .Name }} {{ .Name }} `json:"{{ toLower .Name }}"`
+    {{ .Name }} *{{ .Name }} `json:"{{ toLower .Name }}"`
 }
 
 // Update{{ .Name }}Request ...
 type Update{{ .Name }}Request struct {
-    {{ .Name }} {{ .Name }} `json:"{{ toLower .Name }}"`
+    {{ .Name }} *{{ .Name }} `json:"{{ toLower .Name }}"`
 }
 
 // Update{{ .Name }}Response ...
 type Update{{ .Name }}Response struct {
-    {{ .Name }} {{ .Name }} `json:"{{ toLower .Name }}"`
+    {{ .Name }} *{{ .Name }} `json:"{{ toLower .Name }}"`
 }
 
 // Delete{{ .Name }}Request ...
