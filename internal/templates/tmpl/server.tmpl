@@ -13,6 +13,7 @@ import (
 	"github.com/bongnv/gokit/util/server"
 	"{{ .Package }}"
 	"{{ .Package }}/internal/endpoint"
+	"github.com/bongnv/gokit/util/httputil"
 )
 
 // GetOptions ...
@@ -30,18 +31,18 @@ func getHTTPOptions(serverEndpoints endpoints) []server.Option {
 	opts := []server.Option{}
 
 	opts = append(opts,
-    {{range $endpoint := .Endpoints -}}
-        server.WithHTTPEndpoint(server.Endpoint{
-            Method:         "{{ $endpoint.Method }}",
-            Path:           "{{ $endpoint.HTTPPath }}",
-            Endpoint:       serverEndpoints.{{ $endpoint.Name }}Endpoint,
+	{{range $endpoint := .Endpoints -}}
+		server.WithHTTPEndpoint(server.Endpoint{
+			Method:         "{{ $endpoint.Method }}",
+			Path:           "{{ $endpoint.HTTPPath }}",
+			Endpoint:       serverEndpoints.{{ $endpoint.Name }}Endpoint,
 		{{- if eq (len $endpoint.Params) 1}}
 			RequestDecoder: nil,
 		{{ else }}
-        	RequestDecoder: decode{{ $endpoint.Name}}Request,
+			RequestDecoder: decode{{ $endpoint.Name}}Request,
 		{{ end -}}
-        }),
-    {{ end -}}
+		}),
+	{{ end -}}
 	)
 
 	return opts
@@ -52,6 +53,11 @@ func getHTTPOptions(serverEndpoints endpoints) []server.Option {
 func decode{{ $endpoint.Name}}Request(_ context.Context, r *http.Request) (request interface{}, err error) {
 	{{- $requestType := (index $endpoint.Params 1).Type -}}
 	req := {{ initValue $requestType }}
+
+	if err := httputil.DecodeURL(r, req); err != nil {
+		return nil, err
+	}
+	
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil && err != io.EOF {
 		return nil, err
 	}
