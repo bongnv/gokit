@@ -10,17 +10,20 @@ import (
 	"github.com/bongnv/gokit/internal/generator"
 	"github.com/bongnv/gokit/internal/parser"
 	"github.com/bongnv/gokit/internal/task"
-	"github.com/bongnv/gokit/internal/writer"
+	"github.com/bongnv/gokit/internal/iohelper"
 	"github.com/google/subcommands"
 )
 
 const (
 	crudTemplateName        = "crud"
 	crudHandlerTemplateName = "crud_handler"
+	entityTemplateName      = "entity"
 )
 
 var (
 	handlersFolder = path.Join(internalFolder, "handlers")
+	storageFolder  = path.Join(internalFolder, "storage")
+	storageFile    = path.Join(storageFolder, "storage.go")
 )
 
 type crudCmd struct {
@@ -28,7 +31,9 @@ type crudCmd struct {
 	resource      string
 	serviceParser parser.Parser
 	crudParser    parser.Parser
-	writer        writer.Writer
+	writer        iohelper.Writer
+	reader        iohelper.Reader
+	entityParser  parser.Parser
 }
 
 func (*crudCmd) Name() string     { return "crud" }
@@ -61,6 +66,7 @@ func (c *crudCmd) Do() error {
 
 	crudFilePath := path.Join(c.path, strings.ToLower(c.resource)+"_service.go")
 	handlerFilePath := path.Join(c.path, handlersFolder, strings.ToLower(c.resource)+"_handler.go")
+	storageFilePath := path.Join(c.path, storageFile)
 	tasks := task.Group{
 		&generator.Generator{
 			FilePath:     crudFilePath,
@@ -79,6 +85,19 @@ func (c *crudCmd) Do() error {
 			TemplateName: crudHandlerTemplateName,
 			Data:         d,
 			Writer:       c.writer,
+		},
+		&generator.Appender{
+			FilePath:     storageFilePath,
+			TemplateName: entityTemplateName,
+			Data:         d,
+			Writer:       c.writer,
+			Reader:       c.reader,
+		},
+		&entityCmd{
+			path:         path.Join(c.path, storageFolder),
+			entityName:   c.resource,
+			entityParser: c.entityParser,
+			writer:       c.writer,
 		},
 	}
 

@@ -53,5 +53,5 @@ func (p EntityParser) parseServiceData(pkgs []*packages.Package, entityName stri
 		}
 	}
 
-	return nil, errors.New("serviceParser: no service found")
+	return nil, errors.New("entityParser: no entity found")
 }

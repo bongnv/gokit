@@ -10,7 +10,7 @@ import (
 	"github.com/bongnv/gokit/internal/generator"
 	"github.com/bongnv/gokit/internal/parser"
 	"github.com/bongnv/gokit/internal/task"
-	"github.com/bongnv/gokit/internal/writer"
+	"github.com/bongnv/gokit/internal/iohelper"
 	"github.com/google/subcommands"
 )
 
@@ -28,7 +28,7 @@ type serviceCmd struct {
 	path          string
 	interfaceName string
 	parser        parser.Parser
-	writer        writer.Writer
+	writer        iohelper.Writer
 }
 
 func (*serviceCmd) Name() string     { return "service" }

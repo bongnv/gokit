@@ -85,8 +85,8 @@ func parsePackages(path string) ([]*packages.Package, error) {
 	return packages.Load(
 		&packages.Config{
 			Mode: parseMode,
+			Dir:  path,
 		},
-		path,
 	)
 }
 

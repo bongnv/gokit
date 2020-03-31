@@ -1,4 +1,4 @@
-package writer
+package iohelper
 
 import (
 	"os"
@@ -14,7 +14,7 @@ type Writer interface {
 // FileWriter is an implementation of Writer to file to file.
 type FileWriter struct{}
 
-func (fw *FileWriter) Write(path string, data []byte) error {
+func (fw FileWriter) Write(path string, data []byte) error {
 	if err := fw.ensurePath(filepath.Dir(path)); err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func (fw *FileWriter) Write(path string, data []byte) error {
 	return err
 }
 
-func (fw *FileWriter) ensurePath(path string) error {
+func (fw FileWriter) ensurePath(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return os.MkdirAll(path, os.ModePerm)
 	}
