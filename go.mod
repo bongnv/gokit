@@ -9,6 +9,7 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/google/subcommands v1.2.0
 	github.com/gorilla/mux v1.7.3
+	github.com/gorilla/schema v1.1.0
 	github.com/jinzhu/gorm v1.9.12
 	github.com/samuel/go-thrift v0.0.0-20191111193933-5165175b40af
 	github.com/stretchr/testify v1.4.0
