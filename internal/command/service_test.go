@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/bongnv/gokit/internal/parser"
-	"github.com/bongnv/gokit/internal/writer"
+	"github.com/bongnv/gokit/internal/iohelper"
 	"github.com/google/subcommands"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -22,7 +22,7 @@ func Test_getFilePath(t *testing.T) {
 
 func Test_serviceCmd_Execute(t *testing.T) {
 	mockParser := &parser.MockParser{}
-	mockWriter := &writer.MockWriter{}
+	mockWriter := &iohelper.MockWriter{}
 	cmd := &serviceCmd{
 		parser:        mockParser,
 		writer:        mockWriter,

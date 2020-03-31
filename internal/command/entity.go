@@ -4,13 +4,14 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log"
 	"path"
 	"strings"
 
 	"github.com/bongnv/gokit/internal/generator"
 	"github.com/bongnv/gokit/internal/parser"
 	"github.com/bongnv/gokit/internal/task"
-	"github.com/bongnv/gokit/internal/writer"
+	"github.com/bongnv/gokit/internal/iohelper"
 	"github.com/google/subcommands"
 )
 
@@ -22,7 +23,7 @@ type entityCmd struct {
 	path         string
 	entityName   string
 	entityParser parser.Parser
-	writer       writer.Writer
+	writer       iohelper.Writer
 }
 
 func (*entityCmd) Name() string     { return "entity" }
@@ -51,6 +52,7 @@ func (c *entityCmd) Do() error {
 	// TODO: validate entity name
 	d, err := c.entityParser.Parse(c.path, c.entityName)
 	if err != nil {
+		log.Printf("Couldn't parse %s from %s.\n", c.entityName, c.path)
 		return err
 	}
 	fileName := "z_" + strings.ToLower(c.entityName) + "_dao.go"

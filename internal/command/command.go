@@ -5,7 +5,7 @@ import (
 	"flag"
 
 	"github.com/bongnv/gokit/internal/parser"
-	"github.com/bongnv/gokit/internal/writer"
+	"github.com/bongnv/gokit/internal/iohelper"
 	"github.com/google/subcommands"
 )
 
@@ -16,22 +16,24 @@ func Execute(ctx context.Context) int {
 	subcommands.Register(subcommands.CommandsCommand(), "")
 
 	subcommands.Register(&scaffoldCmd{
-		writer: &writer.FileWriter{},
+		writer: &iohelper.FileWriter{},
 	}, "")
 
 	subcommands.Register(&serviceCmd{
 		parser: &parser.DefaultParser{},
-		writer: &writer.FileWriter{},
+		writer: &iohelper.FileWriter{},
 	}, "")
 
 	subcommands.Register(&crudCmd{
 		serviceParser: &parser.DefaultParser{},
 		crudParser:    parser.CRUDParser{},
-		writer:        &writer.FileWriter{},
+		writer:        &iohelper.FileWriter{},
+		reader:        &iohelper.FileReader{},
+		entityParser:  parser.EntityParser{},
 	}, "")
 
 	subcommands.Register(&entityCmd{
-		writer:       &writer.FileWriter{},
+		writer:       &iohelper.FileWriter{},
 		entityParser: parser.EntityParser{},
 	}, "")
 

@@ -10,7 +10,7 @@ import (
 	"github.com/bongnv/gokit/internal/generator"
 	"github.com/bongnv/gokit/internal/parser"
 	"github.com/bongnv/gokit/internal/task"
-	"github.com/bongnv/gokit/internal/writer"
+	"github.com/bongnv/gokit/internal/iohelper"
 	"github.com/google/subcommands"
 )
 
@@ -29,7 +29,7 @@ var (
 type scaffoldCmd struct {
 	dir    string
 	pkg    string
-	writer writer.Writer
+	writer iohelper.Writer
 }
 
 func (*scaffoldCmd) Name() string     { return "scaffold" }
