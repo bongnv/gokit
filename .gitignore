@@ -21,3 +21,6 @@
 .vscode/
 
 .DS_Store
+
+node_modules/
+docs/.vuepress/dist
