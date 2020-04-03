@@ -5,7 +5,7 @@ on:
       - master
       - add-docs
     paths:
-      - "docs/**"
+      - 'docs/**'
 jobs:
   build-and-deploy:
     name: Build and Deploy
