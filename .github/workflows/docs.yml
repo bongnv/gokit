@@ -1,5 +1,8 @@
 name: Docs
-on: ["push"]
+on: 
+  push:
+    paths:
+      - 'docs/**'
 jobs:
   build-and-deploy:
     name: Build and Deploy
@@ -18,4 +21,4 @@ jobs:
         with:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           BRANCH: gh-pages
-          FOLDER: /docs/.vuepress/dist
+          FOLDER: docs/.vuepress/dist
