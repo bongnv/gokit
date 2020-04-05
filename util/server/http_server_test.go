@@ -1,17 +1,18 @@
 package server
 
 import (
-	"bytes"
 	"context"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_initializeHandler(t *testing.T) {
 	expectedBody := "1\n"
+	decoraterCalled := 0
 	h := &httpServer{
 		endpoints: []Endpoint{
 			{
@@ -27,7 +28,7 @@ func Test_initializeHandler(t *testing.T) {
 		},
 		handlerDecorators: []handlerDecorator{
 			func(h http.Handler) http.Handler {
-				fmt.Println("handling")
+				decoraterCalled++
 				return h
 			},
 		},
@@ -37,17 +38,10 @@ func Test_initializeHandler(t *testing.T) {
 	s := httptest.NewServer(h.httpHandler)
 	defer s.Close()
 	resp, err := s.Client().Get(s.URL)
-	if err != nil {
-		t.Fatalf("unexpected error getting from server: %v", err)
-	}
-	if resp.StatusCode != 200 {
-		t.Fatalf("expected a status code of 200, got %v", resp.StatusCode)
-	}
+	require.NoError(t, err)
+	require.Equal(t, 200, resp.StatusCode)
 	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatalf("unexpected error reading body: %v", err)
-	}
-	if !bytes.Equal(body, []byte(expectedBody)) {
-		t.Fatalf("response should be hello world, was: %q", string(body))
-	}
+	require.NoError(t, err)
+	require.Equal(t, []byte(expectedBody), body)
+	require.Equal(t, 1, decoraterCalled)
 }
