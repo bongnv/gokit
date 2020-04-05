@@ -11,6 +11,7 @@ require (
 	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/schema v1.1.0
 	github.com/jinzhu/gorm v1.9.12
+	github.com/rs/cors v1.7.0
 	github.com/samuel/go-thrift v0.0.0-20191111193933-5165175b40af
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073 // indirect
