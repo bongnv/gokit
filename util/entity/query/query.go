@@ -36,3 +36,14 @@ func Offset(offset int64) Query {
 		return db.Offset(offset)
 	}
 }
+
+// OrderBy implements ORDER BY query.
+func OrderBy(field string, asc bool) Query {
+	return func(db *gorm.DB) *gorm.DB {
+		if asc {
+			return db.Order(field + " ASC")
+		}
+
+		return db.Order(field + " DESC")
+	}
+}
