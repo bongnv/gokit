@@ -62,3 +62,19 @@ func Test_Offset(t *testing.T) {
 	require.Len(t, items, 1)
 	require.EqualValues(t, 2, items[0].ID)
 }
+
+func Test_OrderBy(t *testing.T) {
+	db, err := gorm.Open("sqlite3", ":memory:")
+	require.NoError(t, err)
+	defer db.Close()
+
+	db.AutoMigrate(&gorm.Model{})
+	db.Create(&gorm.Model{ID: 1})
+	db.Create(&gorm.Model{ID: 2})
+
+	var items []*gorm.Model
+	result := OrderBy("id", false)(db).Find(&items)
+	require.NoError(t, result.Error)
+	require.Len(t, items, 1)
+	require.EqualValues(t, 2, items[0].ID)
+}
