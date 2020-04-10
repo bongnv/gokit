@@ -73,7 +73,7 @@ func Test_OrderBy(t *testing.T) {
 	db.Create(&gorm.Model{ID: 2})
 
 	var items []*gorm.Model
-	result := OrderBy("id", false)(db).Find(&items)
+	result := Limit(1)(OrderBy("id", false)(db)).Find(&items)
 	require.NoError(t, result.Error)
 	require.Len(t, items, 1)
 	require.EqualValues(t, 2, items[0].ID)
