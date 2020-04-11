@@ -20,10 +20,6 @@ func (p CRUDParser) Parse(path, resourceName string) (*Data, error) {
 }
 
 func (p CRUDParser) parseServiceData(pkgs []*packages.Package, resourceName string) (*Data, error) {
-	if len(pkgs) == 0 {
-		return nil, errors.New("crudParser: no package found")
-	}
-
 	for _, pkg := range pkgs {
 		for _, f := range pkg.Syntax {
 			s := &Data{
