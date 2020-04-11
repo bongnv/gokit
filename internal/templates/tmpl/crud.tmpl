@@ -2,6 +2,9 @@ package {{ .PackageName }}
 
 import "context"
 
+type {{ .Name }} struct {
+}
+
 // {{ .Name }}Service is a CRUD interface for a {{ .Name }} service.
 //go:generate gokit service -interface {{ .Name }}Service
 type {{ .Name }}Service interface {

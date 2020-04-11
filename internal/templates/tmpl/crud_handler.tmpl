@@ -38,10 +38,17 @@ func (i *{{ $implName }}) Get(ctx context.Context, req *{{ .PackageName }}.Get{{
 }
 
 func (i *{{ $implName }}) List(ctx context.Context, req *{{ .PackageName }}.List{{ .Name }}Request) (*{{ .PackageName }}.List{{ .Name }}Response, error) {
-	entities, err := i.{{ $daoName }}.Query(ctx,
-		query.Offset(req.Offset),
-		query.Limit(req.Limit),
-	)
+	filters := []query.Query{}
+
+	if req.Offset > 0 {
+		filters = append(filters, query.Offset(req.Offset))
+	}
+
+	if req.Limit > 0 {
+		filters = append(filters, query.Limit(req.Limit))
+	}
+
+	entities, err := i.{{ $daoName }}.Query(ctx, filters...)
 
 	if err != nil {
 		return nil, err

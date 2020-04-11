@@ -2,7 +2,6 @@ package parser
 
 import (
 	"errors"
-	"go/ast"
 
 	"golang.org/x/tools/go/packages"
 )
@@ -21,37 +20,20 @@ func (p CRUDParser) Parse(path, resourceName string) (*Data, error) {
 }
 
 func (p CRUDParser) parseServiceData(pkgs []*packages.Package, resourceName string) (*Data, error) {
+	if len(pkgs) == 0 {
+		return nil, errors.New("crudParser: no package found")
+	}
+
 	for _, pkg := range pkgs {
 		for _, f := range pkg.Syntax {
-			for _, decl := range f.Decls {
-				if decl, ok := decl.(*ast.GenDecl); ok {
-					for _, spec := range decl.Specs {
-						spec, ok := spec.(*ast.TypeSpec)
-						if !ok {
-							continue
-						}
-
-						if spec.Name.Name != resourceName {
-							continue
-						}
-
-						_, ok = spec.Type.(*ast.StructType)
-						if !ok {
-							continue
-						}
-
-						s := &Data{
-							Name:        resourceName,
-							Package:     pkg.PkgPath,
-							PackageName: f.Name.Name,
-						}
-
-						return s, nil
-					}
-				}
+			s := &Data{
+				Name:        resourceName,
+				Package:     pkg.PkgPath,
+				PackageName: f.Name.Name,
 			}
+			return s, nil
 		}
 	}
 
-	return nil, errors.New("serviceParser: no service found")
+	return nil, errors.New("crudParser: no service found")
 }
