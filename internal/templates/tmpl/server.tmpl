@@ -54,11 +54,7 @@ func decode{{ $endpoint.Name}}Request(_ context.Context, r *http.Request) (reque
 	{{- $requestType := (index $endpoint.Params 1).Type -}}
 	req := {{ initValue $requestType }}
 
-	if err := httputil.DecodeURL(r, req); err != nil {
-		return nil, err
-	}
-	
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil && err != io.EOF {
+	if err := httputil.DecodeRequest(r, req); err != nil {
 		return nil, err
 	}
 
