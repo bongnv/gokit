@@ -9,9 +9,9 @@ import (
 	"strings"
 
 	"github.com/bongnv/gokit/internal/generator"
+	"github.com/bongnv/gokit/internal/iohelper"
 	"github.com/bongnv/gokit/internal/parser"
 	"github.com/bongnv/gokit/internal/task"
-	"github.com/bongnv/gokit/internal/iohelper"
 	"github.com/google/subcommands"
 )
 
