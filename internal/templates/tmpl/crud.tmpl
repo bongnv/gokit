@@ -6,7 +6,7 @@ type {{ .Name }} struct {
 }
 
 // {{ .Name }}Service is a CRUD interface for a {{ .Name }} service.
-//go:generate gokit service -interface {{ .Name }}Service
+//go:generate gokitgen service -interface {{ .Name }}Service
 type {{ .Name }}Service interface {
     //gokit: method:"GET" path:"/{{ .Name | toLower | toPlural }}/{ID}"
 	Get(ctx context.Context, req *Get{{ .Name }}Request) (*Get{{ .Name }}Response, error)

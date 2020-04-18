@@ -3,8 +3,8 @@ package generator
 import (
 	"testing"
 
-	"github.com/bongnv/gokit/internal/parser"
 	"github.com/bongnv/gokit/internal/iohelper"
+	"github.com/bongnv/gokit/internal/parser"
 	"github.com/stretchr/testify/require"
 )
 
@@ -31,7 +31,7 @@ package main
 import "time"
 
 // Entity ...
-//go:generate gokit entity -name Entity
+//go:generate gokitgen entity -name Entity
 type Entity struct {
 	ID        int64     `+"`"+`gorm:"primary_key"`+"`"+`
 	CreatedAt time.Time `+"`"+`gorm:"not null"`+"`"+`
