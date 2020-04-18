@@ -1,6 +1,6 @@
 
 // {{ .Name }} ...
-//go:generate gokit entity -name {{ .Name }}
+//go:generate gokitgen entity -name {{ .Name }}
 type {{ .Name }} struct {
 	ID        int64     `gorm:"primary_key"`
 	CreatedAt time.Time `gorm:"not null"`
